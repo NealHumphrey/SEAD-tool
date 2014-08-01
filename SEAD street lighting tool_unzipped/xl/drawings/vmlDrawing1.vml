@@ -1,0 +1,38 @@
+<xml xmlns:v="urn:schemas-microsoft-com:vml"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel">
+ <o:shapelayout v:ext="edit">
+  <o:idmap v:ext="edit" data="3619,22863"/>
+ </o:shapelayout><v:shapetype id="_x0000_t201" coordsize="21600,21600" o:spt="201"
+  path="m,l,21600r21600,l21600,xe">
+  <v:stroke joinstyle="miter"/>
+  <v:path shadowok="f" o:extrusionok="f" strokeok="f" fillok="f" o:connecttype="rect"/>
+  <o:lock v:ext="edit" shapetype="t"/>
+ </v:shapetype><v:shape id="_x0000_s3706113" type="#_x0000_t201" style='position:absolute;
+  margin-left:222.75pt;margin-top:248.25pt;width:124.5pt;height:16.5pt;
+  z-index:1' o:button="t" stroked="f" strokecolor="windowText [64]"
+  o:insetmode="auto">
+  <v:fill o:detectmouseclick="t"/>
+  <o:lock v:ext="edit" rotation="t" text="t"/>
+  <x:ClientData ObjectType="Drop">
+   <x:SizeWithCells/>
+   <x:Anchor>
+    2, 2, 13, 9, 2, 168, 13, 31</x:Anchor>
+   <x:AutoLine>False</x:AutoLine>
+   <x:FmlaMacro>[0]!LoadExample</x:FmlaMacro>
+   <x:FmlaLink>$C$14</x:FmlaLink>
+   <x:Val>0</x:Val>
+   <x:Min>0</x:Min>
+   <x:Max>0</x:Max>
+   <x:Inc>1</x:Inc>
+   <x:Page>3</x:Page>
+   <x:Dx>22</x:Dx>
+   <x:FmlaRange>ExampleChoices</x:FmlaRange>
+   <x:Sel>2</x:Sel>
+   <x:NoThreeD2/>
+   <x:SelType>Single</x:SelType>
+   <x:LCT>Normal</x:LCT>
+   <x:DropStyle>Combo</x:DropStyle>
+   <x:DropLines>8</x:DropLines>
+  </x:ClientData>
+ </v:shape></xml>
