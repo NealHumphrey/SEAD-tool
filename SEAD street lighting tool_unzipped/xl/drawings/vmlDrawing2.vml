@@ -1,0 +1,37 @@
+<xml xmlns:v="urn:schemas-microsoft-com:vml"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel">
+ <o:shapelayout v:ext="edit">
+  <o:idmap v:ext="edit" data="1093,11610,25475"/>
+ </o:shapelayout><v:shapetype id="_x0000_t201" coordsize="21600,21600" o:spt="201"
+  path="m,l,21600r21600,l21600,xe">
+  <v:stroke joinstyle="miter"/>
+  <v:path shadowok="f" o:extrusionok="f" strokeok="f" fillok="f" o:connecttype="rect"/>
+  <o:lock v:ext="edit" shapetype="t"/>
+ </v:shapetype><v:shape id="_x0000_s11889476" type="#_x0000_t201" style='position:absolute;
+  margin-left:83.25pt;margin-top:539.25pt;width:207.75pt;height:81.75pt;
+  z-index:1;mso-wrap-style:tight' o:button="t" stroked="f" strokecolor="windowText [64]"
+  o:insetmode="auto">
+  <v:fill o:detectmouseclick="t"/>
+  <o:lock v:ext="edit" rotation="t" text="t"/>
+  <x:ClientData ObjectType="List">
+   <x:SizeWithCells/>
+   <x:Anchor>
+    1, 37, 16, 8, 2, 237, 20, 13</x:Anchor>
+   <x:RecalcAlways/>
+   <x:AutoLine>False</x:AutoLine>
+   <x:FmlaMacro>[0]!ListBox1860_Change</x:FmlaMacro>
+   <x:FmlaLink>FixtureData!$C$18</x:FmlaLink>
+   <x:Val>0</x:Val>
+   <x:Min>0</x:Min>
+   <x:Max>30</x:Max>
+   <x:Inc>1</x:Inc>
+   <x:Page>8</x:Page>
+   <x:Dx>16</x:Dx>
+   <x:FmlaRange>FixtureChoices</x:FmlaRange>
+   <x:Sel>3</x:Sel>
+   <x:NoThreeD2/>
+   <x:SelType>Single</x:SelType>
+   <x:LCT>Normal</x:LCT>
+  </x:ClientData>
+ </v:shape></xml>
