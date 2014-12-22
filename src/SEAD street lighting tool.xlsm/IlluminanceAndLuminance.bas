@@ -99,7 +99,7 @@ fixtureY = FixturePosition(NumberOfLanes, poleconfig, MedianLength, polespacing,
 'extraY = FixtureHeight * Tan(tiltRadians)       'Additional distance along cross-road axis due to tilt. X is along the road. Y is across the road.
 
 'new way
-tiltOnX = 0 / 180 * WorksheetFunction.Pi        'the up down tilt
+tiltOnX = 30 / 180 * WorksheetFunction.Pi        'the up down tilt
 tiltOnY = 0 / 180 * WorksheetFunction.Pi        'towards or away from observer, i.e. twisting the arm
 tiltOnZ = 0 / 180 * WorksheetFunction.Pi        'twisting the pole
 'Tilt--------------------------

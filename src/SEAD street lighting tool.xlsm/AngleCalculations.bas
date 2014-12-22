@@ -13,28 +13,28 @@ outputY = gridXY(1)
 
 'grid start and end
 If calculationmethod = "IES" Then
-    iStart = WorksheetFunction.Match(polespacing, outputX, True)
-    iEnd = WorksheetFunction.Match(2 * polespacing, outputX, True) - 1
+    istart = WorksheetFunction.Match(polespacing, outputX, True)
+    iend = WorksheetFunction.Match(2 * polespacing, outputX, True) - 1
 ElseIf calculationmethod = "CIE" Then
 'start at what fixture
     startfixture = Int(5 * FixtureHeight / polespacing)
     startfixture = startfixture + 1
-    iStart = WorksheetFunction.Match(polespacing * startfixture, outputX, True) + 1
-    iEnd = WorksheetFunction.Match(polespacing * (startfixture + 1), outputX, True)
-    Debug.Print "iStart in angleGamma is " & iStart
-    Debug.Print "iEnd in angleGamma is " & iEnd
+    istart = WorksheetFunction.Match(polespacing * startfixture, outputX, True) + 1
+    iend = WorksheetFunction.Match(polespacing * (startfixture + 1), outputX, True)
+    Debug.Print "iStart in angleGamma is " & istart
+    Debug.Print "iEnd in angleGamma is " & iend
     'iStart = WorksheetFunction.Match(5 * FixtureHeight, outputX, True)
     'iEnd = WorksheetFunction.Match(5 * FixtureHeight + polespacing, outputX, True)
 End If
 
 'X is along the road. Y is across the road.
-numberOfX = iEnd - iStart
+numberOfX = iend - istart
 numberOfY = UBound(outputY)
 
 Dim gammaArray()
-ReDim gammaArray(iStart To iEnd, numberOfY)
+ReDim gammaArray(istart To iend, numberOfY)
 m = outputX(1)
-For i = iStart To iEnd
+For i = istart To iend
 For j = 0 To numberOfY
     distY = fixtureY                     'grid measurement including tilt
     dist = Distance(fixtureX, distY, outputX(i), outputY(j))
@@ -50,9 +50,10 @@ angleGamma = gammaArray
 End Function
 
 Function angleGammaWithTilt(fixtureX, fixtureY, gridXY, polespacing, FixtureHeight, tiltOnX, tiltOnY, tiltOnZ, calculationmethod) As Variant
+'gamma is the vertical angle coming out of the fixture
 Dim phi() As Integer
 
-'arrays to carry all x and y values
+'arrays to carry all x and y values - contains grid points
 Dim outputX()
 Dim outputY()
 outputX = gridXY(0)
@@ -60,41 +61,71 @@ outputY = gridXY(1)
 
 'grid start and end
 If calculationmethod = "IES" Then
-    iStart = WorksheetFunction.Match(polespacing, outputX, True)
-    iEnd = WorksheetFunction.Match(2 * polespacing, outputX, True) - 1
+    istart = WorksheetFunction.Match(polespacing, outputX, True)
+    iend = WorksheetFunction.Match(2 * polespacing, outputX, True) - 1
 ElseIf calculationmethod = "CIE" Then
 'start at what fixture
     startfixture = Int(5 * FixtureHeight / polespacing)
     startfixture = startfixture + 1
-    iStart = WorksheetFunction.Match(polespacing * startfixture, outputX, True) + 1
-    iEnd = WorksheetFunction.Match(polespacing * (startfixture + 1), outputX, True)
+    istart = WorksheetFunction.Match(polespacing * startfixture, outputX, True) + 1
+    iend = WorksheetFunction.Match(polespacing * (startfixture + 1), outputX, True)
 End If
 
+'inputs needed for calculating distances. FLAG spreadsheet calls need to be removed from this function.
+If Sheets("FixtureData").Range("A6").Value = "Baseline" Then
+    lanewidth = Sheets("Road Geometry").Range("bLaneWidth").Value
+    MedianLength = Sheets("Road Geometry").Range("bMedianWidth").Value
+    NumberOfLanes = Sheets("Road Geometry").Range("bNumLanes").Value
+    poleconfig = Sheets("Road Geometry").Range("bFixtureArrangement").Value
+ElseIf Sheets("FixtureData").Range("A6").Value = "Upgrade" Then
+    lanewidth = Sheets("Road Geometry").Range("uLaneWidth").Value
+    MedianLength = Sheets("Road Geometry").Range("uMedianWidth").Value
+    NumberOfLanes = Sheets("Road Geometry").Range("uNumLanes").Value
+    poleconfig = Sheets("Road Geometry").Range("uFixtureArrangement").Value
+End If
+
+
 'X is along the road. Y is across the road.
-numberOfX = iEnd - iStart
+numberOfX = iend - istart
 numberOfY = UBound(outputY)
 
 Dim gammaArray()
-ReDim gammaArray(iStart To iEnd, numberOfY)
+ReDim gammaArray(istart To iend, numberOfY)
+
+'for debug purposes
+Dim xArray()
+ReDim xArray(istart To iend, numberOfY)
+Dim yArray()
+ReDim yArray(istart To iend, numberOfY)
+Dim xPrimeArray()
+ReDim xPrimeArray(istart To iend, numberOfY)
+Dim yPrimeArray()
+ReDim yPrimeArray(istart To iend, numberOfY)
+Dim hPrimeArray()
+ReDim hPrimeArray(istart To iend, numberOfY)
+
+
 m = outputX(1)
-For i = iStart To iEnd
+For i = istart To iend
     For j = 0 To numberOfY
         '    v = tiltOnZ
         '    w = tiltOnY
         '    o = tiltOnX
         Dim x As Double, y As Double
+        'FLAG - version 0. This is the one in the
 '        x = (outputX(i) - fixtureX)
 '        y = (outputY(j) - fixtureY)
         
-        'FLAG is this necessary?
+        'FLAG - version 1. In this one, results for opposite street sides are not opposite (19.7 vers 24.8 for first grid point)
         x = (outputX(i) - fixtureX)
-'        If fixtureY > (lanewidth * NumberOfLanes / 2) Then  'if the fixture is located on the near side of the road  'FLAG this is flipped backwards to test if the negative is the problem (here or elsewhere...)
-'            y = (outputY(j) - fixtureY)
-'        Else
-'            y = (fixtureY - outputY(j))
-'        End If
-        'TEST - does this need to be reversed?
-        y = (fixtureY - outputY(j)) 'testing if it fixes it to overwrite
+        If fixtureY > (lanewidth * NumberOfLanes / 2) Then  'if the fixture is located on the far side of the road
+            y = (fixtureY - outputY(j))
+        Else
+            y = (outputY(j) - fixtureY)
+        End If
+        
+        'FLAG - version 2. Produces the same results as version 1 for the two near fixtres, but traded across the road.
+        'y = (fixtureY - outputY(j)) 'testing if it fixes it to overwrite
         
         xPrime = x * (Cos(tiltOnZ) * Cos(tiltOnY) - Sin(tiltOnZ) * Sin(tiltOnX) * Sin(tiltOnY)) + _
                  y * (Sin(tiltOnZ) * Cos(tiltOnY) + Cos(tiltOnZ) * Sin(tiltOnX) * Sin(tiltOnY)) + _
@@ -108,6 +139,14 @@ For i = iStart To iEnd
                     
         gammaTemp = Atn(((xPrime ^ 2 + yPrime ^ 2) ^ 0.5) / HPrime) * 180 / WorksheetFunction.Pi
         gammaArray(i, j) = gammaTemp
+        
+        
+        'saving for debug purposes only
+        xArray(i, j) = x
+        yArray(i, j) = y
+        xPrimeArray(i, j) = xPrime
+        yPrimeArray(i, j) = yPrime
+        hPrimeArray(i, j) = HPrime
             
         '    distY = fixtureY
         '    dist = Distance(fixtureX, distY, outputX(i), outputY(j))
@@ -119,7 +158,29 @@ For i = iStart To iEnd
         '    End If
     Next
 Next
+
+'Temp code for debugging purposes
+'If fixtureX = 35 Then 'Only worry about writing the two opposing fixtures
+'    Dim rrow As Integer
+'    rrow = 1
+'    Dim aOutputGamma()
+'    ReDim aOutput(300, 300) As Variant
+'
+'    Call printIntermediateVariables(rrow, aOutputGamma, xArray)
+'    Call printIntermediateVariables(rrow, aOutputGamma, yArray)
+'    Call printIntermediateVariables(rrow, aOutputGamma, xPrimeArray)
+'    Call printIntermediateVariables(rrow, aOutputGamma, yPrimeArray)
+'    Call printIntermediateVariables(rrow, aOutputGamma, hPrimeArray)
+'
+'    If fixtureY = 0.5 Then yColumn = 22
+'    If fixtureY = 16.5 Then yColumn = 32
+'    Set rTarget = wksScratch.Cells(100, yColumn)
+'    rTarget.Resize(UBound(aOutput, 1), UBound(aOutput, 2)) = aOutput
+'
+'End If
+
 angleGammaWithTilt = gammaArray
+
 End Function
 
 Function Distance(x1, y1, x2, y2)
@@ -148,28 +209,28 @@ End If
 
 'grid start and end
 If calculationmethod = "IES" Then
-    iStart = WorksheetFunction.Match(polespacing, outputX, True)
-    iEnd = WorksheetFunction.Match(2 * polespacing, outputX, True) - 1
+    istart = WorksheetFunction.Match(polespacing, outputX, True)
+    iend = WorksheetFunction.Match(2 * polespacing, outputX, True) - 1
 ElseIf calculationmethod = "CIE" Then
     'start at what fixture
     startfixture = Int(5 * FixtureHeight / polespacing)
     startfixture = startfixture + 1
-    iStart = WorksheetFunction.Match(polespacing * startfixture, outputX, True) + 1
-    iEnd = WorksheetFunction.Match(polespacing * (startfixture + 1), outputX, True)
+    istart = WorksheetFunction.Match(polespacing * startfixture, outputX, True) + 1
+    iend = WorksheetFunction.Match(polespacing * (startfixture + 1), outputX, True)
     
-    Debug.Print "iStart in anglePhi is " & iStart
-    Debug.Print "iEnd in anglePhi is " & iEnd
+    Debug.Print "iStart in anglePhi is " & istart
+    Debug.Print "iEnd in anglePhi is " & iend
     'iStart = WorksheetFunction.Match(5 * FixtureHeight, outputX, True)
     'iEnd = WorksheetFunction.Match(5 * FixtureHeight + polespacing, outputX, True)
     '**FLAG** when testing CIE make sure this is correct
 End If
 
-numberOfX = iEnd - iStart
+numberOfX = iend - istart
 numberOfY = UBound(outputY)
 Dim phiArray()
-ReDim phiArray(iStart To iEnd, numberOfY)
+ReDim phiArray(istart To iend, numberOfY)
 m = outputX(1)
-For i = iStart To iEnd
+For i = istart To iend
 For j = 0 To numberOfY
 'distance between grid point and fixture point
 'dist = Distance(fixtureX, fixtureY, outputX(i), outputY(j))
@@ -242,25 +303,25 @@ End If
 
 'grid start and end
 If calculationmethod = "IES" Then
-    iStart = WorksheetFunction.Match(polespacing, outputX, True)
-    iEnd = WorksheetFunction.Match(2 * polespacing, outputX, True) - 1
+    istart = WorksheetFunction.Match(polespacing, outputX, True)
+    iend = WorksheetFunction.Match(2 * polespacing, outputX, True) - 1
 ElseIf calculationmethod = "CIE" Then
     'start at what fixture
     startfixture = Int(5 * FixtureHeight / polespacing)
     startfixture = startfixture + 1
-    iStart = WorksheetFunction.Match(polespacing * startfixture, outputX, True) + 1
-    iEnd = WorksheetFunction.Match(polespacing * (startfixture + 1), outputX, True)
+    istart = WorksheetFunction.Match(polespacing * startfixture, outputX, True) + 1
+    iend = WorksheetFunction.Match(polespacing * (startfixture + 1), outputX, True)
     'iStart = WorksheetFunction.Match(5 * FixtureHeight, outputX, True)
     'iEnd = WorksheetFunction.Match(5 * FixtureHeight + polespacing, outputX, True)
     '**FLAG** when testing CIE make sure this is correct
 End If
 
-numberOfX = iEnd - iStart
+numberOfX = iend - istart
 numberOfY = UBound(outputY)
 Dim phiArray()
-ReDim phiArray(iStart To iEnd, numberOfY)
+ReDim phiArray(istart To iend, numberOfY)
 m = outputX(1)
-For i = iStart To iEnd
+For i = istart To iend
 For j = 0 To numberOfY
 'distance between grid point and fixture point
 'dist = Distance(fixtureX, fixtureY, outputX(i), outputY(j))
@@ -360,26 +421,26 @@ outputY = gridXY(1)     'the location of the grid points
 
 'grid start and end
 If calculationmethod = "IES" Then
-    iStart = WorksheetFunction.Match(polespacing, outputX, True)
-    iEnd = WorksheetFunction.Match(2 * polespacing, outputX, True) - 1
+    istart = WorksheetFunction.Match(polespacing, outputX, True)
+    iend = WorksheetFunction.Match(2 * polespacing, outputX, True) - 1
 ElseIf calculationmethod = "CIE" Then
     'start at what fixture
     startfixture = Int(5 * FixtureHeight / polespacing)
     startfixture = startfixture + 1
-    iStart = WorksheetFunction.Match(polespacing * startfixture, outputX, True) + 1
-    iEnd = WorksheetFunction.Match(polespacing * (startfixture + 1), outputX, True)
+    istart = WorksheetFunction.Match(polespacing * startfixture, outputX, True) + 1
+    iend = WorksheetFunction.Match(polespacing * (startfixture + 1), outputX, True)
     'iStart = WorksheetFunction.Match(5 * FixtureHeight, outputX, True)
     'iEnd = WorksheetFunction.Match(5 * FixtureHeight + polespacing, outputX, True)
 End If
 
-numberOfX = iEnd - iStart
+numberOfX = iend - istart
 numberOfY = UBound(outputY)
 
 Dim betaArray()
-ReDim betaArray(iStart To iEnd, numberOfY)
+ReDim betaArray(istart To iend, numberOfY)
 'This is for IES method
 If calculationmethod = "IES" Then
-For i = iStart To iEnd
+For i = istart To iend
 For j = 0 To numberOfY
     If fixtureX - outputX(i) > 0 Then
         If anglePhi(i, j) >= 90 Then
@@ -398,7 +459,7 @@ For j = 0 To numberOfY
     Next
     '  if CIE method
 ElseIf calculationmethod = "CIE" Then
-    For i = iStart To iEnd
+    For i = istart To iend
     For j = 0 To numberOfY
         xo = outputX(i) - 60
         m1 = (outputY(j) - yo) / (outputX(i) - xo)

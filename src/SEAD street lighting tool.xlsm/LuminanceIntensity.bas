@@ -22,24 +22,24 @@ End If
 
 'grid start and end
 If calculationmethod = "IES" Then
-    iStart = WorksheetFunction.Match(polespacing, outputX, True)
-    iEnd = WorksheetFunction.Match(2 * polespacing, outputX, True) - 1
+    istart = WorksheetFunction.Match(polespacing, outputX, True)
+    iend = WorksheetFunction.Match(2 * polespacing, outputX, True) - 1
 ElseIf calculationmethod = "CIE" Then
     'start at what fixture
     startfixture = Int(5 * FixtureHeight / polespacing)
     startfixture = startfixture + 1
-    iStart = WorksheetFunction.Match(polespacing * startfixture, outputX, True) + 1
-    iEnd = WorksheetFunction.Match(polespacing * (startfixture + 1), outputX, True)
+    istart = WorksheetFunction.Match(polespacing * startfixture, outputX, True) + 1
+    iend = WorksheetFunction.Match(polespacing * (startfixture + 1), outputX, True)
     'iStart = WorksheetFunction.Match(5 * FixtureHeight, outputX, True)
     'iEnd = WorksheetFunction.Match(5 * FixtureHeight + polespacing, outputX, True)
 End If
 
 Dim numberOfX, numberOfY As Integer
 
-numberOfX = iEnd - iStart
+numberOfX = iend - istart
 numberOfY = UBound(outputY)
 Dim LIarray()
-ReDim LIarray(iStart To iEnd, numberOfY)
+ReDim LIarray(istart To iend, numberOfY)
 m = outputX(1)
 
 Dim tablePhi2()
@@ -76,7 +76,7 @@ Next
 tableArray() = Range(Cells(firstRow + 1, 2), Cells(lastRow, lastCol))
 
 
-For i = iStart To iEnd
+For i = istart To iend
 For j = 0 To numberOfY
     LIarray(i, j) = LintensityCalc(gridPhi(i, j), gridGamma(i, j), tablePhi1(), tableGamma1(), tableArray())
 Next

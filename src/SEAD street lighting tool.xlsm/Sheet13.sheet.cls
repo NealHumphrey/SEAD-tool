@@ -7,4 +7,3 @@ Private Sub worksheet_activate()
     Sheet13.EnableCalculation = True
     Sheet13.EnableCalculation = False
 End Sub
-

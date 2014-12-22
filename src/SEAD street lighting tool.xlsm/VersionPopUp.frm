@@ -13,6 +13,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+
 Private Sub Label2_Click()
     Link = "http://superefficient.org/en/Activities/Procurement/SEAD%20Street%20Lighting%20Evaluation%20Toolkit.aspx"
     On Error GoTo NoCanDo

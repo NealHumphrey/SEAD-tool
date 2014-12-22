@@ -15,6 +15,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 
+
 '
 ' Description:  Displays a modeless progress bar on the screen,
 '               by implementing the IProgressBar interface
