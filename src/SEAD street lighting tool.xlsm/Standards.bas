@@ -19,7 +19,7 @@ Call IDStartEndRow(Section, firstRow, lastRow)
 
 'Reset FirstRow to be first row to hide
 firstRow = lastRow + 1
-lastRow = Sheet7.Cells.find(What:="*", after:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
+lastRow = Sheet7.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
 Rows(firstRow & ":" & lastRow).EntireRow.Hidden = True
 
 MsgBox (AddStdMessage)
@@ -56,11 +56,11 @@ Section = "Header"
 Call IDStartEndRow(Section, firstRow, lastRow)
 'unhide all rows
 firstRow = lastRow + 1
-lastRow = Sheet7.Cells.find(What:="*", after:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
+lastRow = Sheet7.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
 Rows(firstRow & ":" & lastRow).EntireRow.Hidden = False
 
 'Find first and last row of the new section
-lastRow = Sheet7.Cells.find(What:="*", after:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
+lastRow = Sheet7.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
 firstRow = Range("A65536").End(xlUp).row + 1
 
 
@@ -99,7 +99,7 @@ Dim lastRow As Integer
     
     'Hide all Standard info rows
     firstRow = lastRow + 1
-    lastRow = Sheet7.Cells.find(What:="*", after:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
+    lastRow = Sheet7.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
     Rows(firstRow & ":" & lastRow).EntireRow.Hidden = True
     
     'Unhide the rows w/ the standard selected
@@ -121,7 +121,7 @@ Dim Above, Below As Boolean
 
 '--------------------Important - must unhide all rows first!!!
 
-lastRow = Sheet7.Cells.find(What:="*", after:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
+lastRow = Sheet7.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
 
     'initialize variables to find the start and end of the section
     row = 1

@@ -126,8 +126,8 @@ Next i
 
 
 'Read data from the Source sheet
-LastRowSource = Sheets(sSource).Cells.find(What:="*", after:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
-LastColSource = Sheets(sSource).Cells.find(What:="*", after:=[a1], SearchOrder:=xlByColumns, SearchDirection:=xlPrevious).column
+LastRowSource = Sheets(sSource).Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
+LastColSource = Sheets(sSource).Cells.find(What:="*", After:=[a1], SearchOrder:=xlByColumns, SearchDirection:=xlPrevious).column
 
 For row = 1 To LastRowSource
     For column = 1 To LastColSource

@@ -26,7 +26,7 @@ End Enum
 Sub ListAllFiles()
     Dim fs As FileSearch, ws As Worksheet, i As Long, filenamelength As Integer
     Dim MyObj As Object, MySource As Object, file As Variant
-    lastRow = Sheet21.Cells.find(What:="*", after:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
+    lastRow = Sheet21.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
     
     Message = Sheet25.Range("SelectIESPathmsg")
     Select Case MsgBox(Message, _
@@ -59,7 +59,7 @@ Sub ReadMultipleISOFile()
 Sheet13.Unprotect
 
 
- lastRow = Sheet21.Cells.find(What:="*", after:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
+ lastRow = Sheet21.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
  
  Blankerror = False
  For row = 21 To lastRow
@@ -472,9 +472,9 @@ Loop
 
 'Sheet2 - fixturedata
 'Sheet13 - Fixtures
-lastRow = Sheet2.Cells.find(What:="*", after:=[a1], SearchOrder:=xlByRows, _
+lastRow = Sheet2.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, _
               SearchDirection:=xlPrevious).row
-LastRowSheet13 = Sheet13.Cells.find(What:="*", after:=[a1], SearchDirection:=xlPrevious).row
+LastRowSheet13 = Sheet13.Cells.find(What:="*", After:=[a1], SearchDirection:=xlPrevious).row
 
 StartRow = lastRow + 1
 startcolumn = 1
@@ -664,7 +664,7 @@ Sheet13.Unprotect
     Range("Base_Upgrade_Choice") = "Upgrade"
 
 'Delete the row on the Fixtures tab
-    Sheet13.Cells.find(What:=DeleteFixtureName, after:=ActiveCell, LookIn:=xlFormulas, LookAt:= _
+    Sheet13.Cells.find(What:=DeleteFixtureName, After:=ActiveCell, LookIn:=xlFormulas, LookAt:= _
         xlWhole).Range("A1:A1").EntireRow.Delete
 
 Sheet13.Protect

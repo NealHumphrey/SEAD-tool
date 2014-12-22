@@ -21,6 +21,8 @@ ElseIf calculationmethod = "CIE" Then
     startfixture = startfixture + 1
     iStart = WorksheetFunction.Match(polespacing * startfixture, outputX, True) + 1
     iEnd = WorksheetFunction.Match(polespacing * (startfixture + 1), outputX, True)
+    Debug.Print "iStart in angleGamma is " & iStart
+    Debug.Print "iEnd in angleGamma is " & iEnd
     'iStart = WorksheetFunction.Match(5 * FixtureHeight, outputX, True)
     'iEnd = WorksheetFunction.Match(5 * FixtureHeight + polespacing, outputX, True)
 End If
@@ -154,6 +156,9 @@ ElseIf calculationmethod = "CIE" Then
     startfixture = startfixture + 1
     iStart = WorksheetFunction.Match(polespacing * startfixture, outputX, True) + 1
     iEnd = WorksheetFunction.Match(polespacing * (startfixture + 1), outputX, True)
+    
+    Debug.Print "iStart in anglePhi is " & iStart
+    Debug.Print "iEnd in anglePhi is " & iEnd
     'iStart = WorksheetFunction.Match(5 * FixtureHeight, outputX, True)
     'iEnd = WorksheetFunction.Match(5 * FixtureHeight + polespacing, outputX, True)
     '**FLAG** when testing CIE make sure this is correct
@@ -463,6 +468,8 @@ Next
 Next
 
 End Sub
+
+
 
 
 

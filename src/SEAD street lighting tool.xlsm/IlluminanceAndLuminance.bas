@@ -69,6 +69,9 @@ LLF = Sheets("FixtureData").Range("H6").Value 'light loss factor
 Dim outputXY()
 Dim gammaArray()
 Dim phi()
+Dim phiArrayForITable()
+Dim gammaArrayForITable()
+Dim betaArray()
 
 'number of grid points?
 Dim ngp As Integer
@@ -96,7 +99,7 @@ fixtureY = FixturePosition(NumberOfLanes, poleconfig, MedianLength, polespacing,
 'extraY = FixtureHeight * Tan(tiltRadians)       'Additional distance along cross-road axis due to tilt. X is along the road. Y is across the road.
 
 'new way
-tiltOnX = 1 / 180 * WorksheetFunction.Pi        'the up down tilt
+tiltOnX = 0 / 180 * WorksheetFunction.Pi        'the up down tilt
 tiltOnY = 0 / 180 * WorksheetFunction.Pi        'towards or away from observer, i.e. twisting the arm
 tiltOnZ = 0 / 180 * WorksheetFunction.Pi        'twisting the pole
 'Tilt--------------------------
@@ -171,6 +174,55 @@ If calcMethod = "IES" Then
         ' Luminance at every grid point by fixture k
         temparray2 = Lum(larray, gammaArray, Rarray, LLF, FixtureHeight)
         luminanceFixture(k) = temparray2
+        
+        'output all calculated values to scratch sheet for debugging
+        If gbDebug = True Then
+            Dim intScratchLastRow As Integer, intScratchLastCol As Integer, rScratchLastCell As Range
+            Set rScratchLastCell = wksScratch.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious)
+            If rScratchLastCell Is Nothing Then Set rScratchLastCell = wksScratch.Range("A1")
+            intScratchLastRow = 1 'rScratchLastCell.row
+            intScratchLastCol = rScratchLastCell.column
+            Dim rr As Integer 'the variable to keep track of current row
+            
+            ReDim aOutput(300, 100) As Variant
+            
+            aOutput(1, 1) = "Fixture" & k
+            aOutput(2, 1) = "X distance"
+            aOutput(2, 2) = fixtureX(k)
+            aOutput(3, 1) = "Y distance"
+            aOutput(3, 2) = fixtureY(k)
+            
+            aOutput(5, 1) = "X distances"
+            
+            Set rTarget = wksScratch.Cells(1, intScratchLastCol)
+            rTarget.Resize(UBound(aOutput, 1), UBound(aOutput, 2)) = aOutput
+                            
+            rr = 6
+            
+            'X distances
+            colNow = 0
+            rowNow = 1
+            For ii = LBound(phi, 1) To UBound(phi, 1)
+                aOutput(rr, 1 + colNow) = outputXY(0)(ii)
+                colNow = colNow + 1
+            Next ii
+            rr = rr + rowNow
+            
+            'Phi Array
+            Call printIntermediateVariables(rr, aOutput, phi)
+            Call printIntermediateVariables(rr, aOutput, phiArrayForITable)
+            Call printIntermediateVariables(rr, aOutput, gammaArray)
+            Call printIntermediateVariables(rr, aOutput, gammaArrayForITable)
+            Call printIntermediateVariables(rr, aOutput, betaArray)
+            Call printIntermediateVariables(rr, aOutput, larray)
+            Call printIntermediateVariables(rr, aOutput, tempArray1) 'Illuminance
+            Call printIntermediateVariables(rr, aOutput, temparray2) 'Luminance
+            
+            Set rTarget = wksScratch.Cells(intScratchLastRow, intScratchLastCol)
+            rTarget.Resize(UBound(aOutput, 1), UBound(aOutput, 2)) = aOutput
+            
+        End If
+        
     Next
     
     '*************************** got luminance and illuminance matrices at every grid point by every fixture till now *********
@@ -469,5 +521,21 @@ Lum = tarray
 
 End Function
 
+Sub printIntermediateVariables(rr As Integer, aOutput() As Variant, aArray() As Variant)
+Dim colNow As Integer, rowNow As Integer
+            colNow = 0
+            rowNow = 0
+            For ii = LBound(aArray, 1) To UBound(aArray, 1)
+                'aOutput(rr, 1 + colNow) = outputXY(0)(ii)    'phi(ii, 1)
+                rowNow = 1
+                For jj = LBound(aArray, 2) To UBound(aArray, 2)
+                    aOutput(rr + rowNow, 1 + colNow) = aArray(ii, jj)
+                    rowNow = rowNow + 1
+                Next jj
+                colNow = colNow + 1
+            Next ii
+            
+            rr = rr + rowNow
+End Sub
 
 

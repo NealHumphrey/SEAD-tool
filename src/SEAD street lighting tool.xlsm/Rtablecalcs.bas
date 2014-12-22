@@ -45,11 +45,11 @@ Dim tableBeta2()
 Dim tableTanGamma2()
 Dim tableRArray()
 
-Sheets("Rtables").Select
-tableBeta2() = Range("D5:W5")
-tableTanGamma2() = Range("C6:C34")
-
-
+With Sheet12
+    tableBeta2() = .Range("D5:W5")
+    tableTanGamma2() = .Range("C6:C34")
+    tableRArray() = .Range("D6:W34")
+End With
 
 Dim gammaN, betaN As Integer
 betaN = UBound(tableBeta2, 2)
@@ -67,9 +67,6 @@ Next
 For n = LBound(tableTanGamma2(), 1) To UBound(tableTanGamma2(), 1)
     tableTanGamma1(n) = tableTanGamma2(n, 1)
 Next
-
-tableRArray() = Range("D6:W34")
-
 
 For i = iStart To iEnd
 For j = 0 To numberOfY

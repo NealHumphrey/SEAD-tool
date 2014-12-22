@@ -1,11 +1,15 @@
 Attribute VB_Name = "MasterModule"
 'This macro was developed by p2w2.  http://p2w2.com/expert-in-microsoft-excel-consultants-consulting/index.php
 'Please contact at CS@perceptive-analytics.com in case of any enquiry
-
+Public gbDebug As Boolean
 
 
 ' Macro assigned to button in inputs sheet
 Sub masterProc()
+
+'debug flag
+gbDebug = True
+
 Application.ScreenUpdating = False
 Dim cMethod As String
 cMethod = Range("calculationMethodChoice").Value
@@ -92,3 +96,4 @@ End Sub
 Sub ActivateLastSheet()
     Sheets(Sheet20.Range("A2").Value).Activate
 End Sub
+

@@ -126,8 +126,8 @@ Max_Spacing = 100
 Spacing_Increments = 5
 
 num_fixtures = Application.CountA(Sheet6.Range("Fixturechoices"))
-lastRow = Sheet11.Cells.find(What:="*", after:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
-lastCol = Sheet11.Cells.find(What:="*", after:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).column
+lastRow = Sheet11.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
+lastCol = Sheet11.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).column
 
 ReDim EnergyPerKm(Max_Spacing / Spacing_Increments, num_fixtures)
 ReDim PassFail(Max_Spacing / Spacing_Increments, num_fixtures)

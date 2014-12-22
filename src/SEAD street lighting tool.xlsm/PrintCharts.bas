@@ -54,7 +54,7 @@ NewWkbk.Colors(15) = RGB(50, 127, 202) 'pass blue - upper bar
     NewWkbk.Sheets(1).Range("A1").Select
 
 
-    LastOutputRow = NewWkbk.Sheets(1).Cells.find(What:="*", after:=[a1], SearchDirection:=xlPrevious).row
+    LastOutputRow = NewWkbk.Sheets(1).Cells.find(What:="*", After:=[a1], SearchDirection:=xlPrevious).row
 
 
 '-----------add a tab for illuminance and luminance versus wattage scatter plots---------

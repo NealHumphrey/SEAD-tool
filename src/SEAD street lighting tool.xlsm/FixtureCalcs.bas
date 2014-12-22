@@ -43,8 +43,8 @@ Dim TotalFixtures As Integer
 
 FirstRow13 = Sheet13.Range("IncludeHeader").row
 'last row on the Fixtures tab
-LastRow13 = Sheet13.Cells.find(What:="*", after:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
-LastCol13 = Sheet13.Cells.find(What:="*", after:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).column
+LastRow13 = Sheet13.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
+LastCol13 = Sheet13.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).column
 
 
 num_fixtures = Application.CountA(Range("Fixturechoices"))
@@ -69,7 +69,7 @@ pbProgBar.Progress = 0.1
     Sheet10.Select
     
     'Find the last column for writing output purposes
-    lastCol = Sheet10.Cells.find(What:="*", after:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).column
+    lastCol = Sheet10.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).column
     
     '---------Calculate the baseline first------------------------------------------------------------
     Application.Calculation = xlCalculationAutomatic
@@ -116,7 +116,7 @@ pbProgBar.Progress = 0.1
     'For each fixture with an 'x' on it in the 'Fixtures' tab, calculate the results
     'Sheet3.Range("Base_Upgrade_Choice").Value = "Upgrade"
     'last row on the results tab (find after writing the baseline to row 4)
-    lastRow = Sheet10.Cells.find(What:="*", after:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
+    lastRow = Sheet10.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
     Sheets("FixtureData").Range("A6") = "Upgrade"
 
     For i = FirstRow13 + 1 To LastRow13

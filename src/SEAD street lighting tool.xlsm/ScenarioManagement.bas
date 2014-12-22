@@ -13,8 +13,8 @@ If ScenarioName = False Then
 Else
 
 
-    lastRow = Sheet10.Cells.find(What:="*", after:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
-    lastCol = Sheet10.Cells.find(What:="*", after:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).column
+    lastRow = Sheet10.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
+    lastCol = Sheet10.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).column
     
     'change to upgrade and save only upgrade data
     Sheet3.Range("Base_Upgrade_Choice").Value = "Upgrade"
@@ -35,7 +35,7 @@ End Sub
 Sub UpdateGraphAlignmentData()
 Application.Calculation = xlCalculationManual
 
-lastRow = Sheet10.Cells.find(What:="*", after:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
+lastRow = Sheet10.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
 count = 0
 For j = 4 To lastRow
     Sheet10.Cells(j, 1) = 0.5 + count
@@ -51,8 +51,8 @@ screenUpdateState = Application.ScreenUpdating
 Application.ScreenUpdating = False
 
 
-lastRow = Sheet10.Cells.find(What:="*", after:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
-lastCol = Sheet10.Cells.find(What:="*", after:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).column
+lastRow = Sheet10.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
+lastCol = Sheet10.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).column
 
 'sort row 5 to last row, all used columns (plus a few extras)
 Sheet10.Range("A5:CC" & lastRow).Sort _
@@ -86,8 +86,8 @@ DeleteTitle = Sheet25.Range("DeleteTitle")
 '    Exit Sub
 'Case vbOK
 
-    lastRow = Sheet10.Cells.find(What:="*", after:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
-    lastCol = Sheet10.Cells.find(What:="*", after:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).column
+    lastRow = Sheet10.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
+    lastCol = Sheet10.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).column
     
     If lastRow = 3 Then
         Exit Sub
