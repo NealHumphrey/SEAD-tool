@@ -27,23 +27,24 @@ Dim missingFlag As Boolean
 
 missingFlag = False
 
-Set rMaster(1) = Sheet5.Range("bNumLanes")
-Set rMaster(2) = Sheet5.Range("bLaneWidth")
-Set rMaster(3) = Sheet5.Range("bMedianWidth")
-Set rMaster(4) = Sheet5.Range("bMountingHeight")
-Set rMaster(5) = Sheet5.Range("bPoleSpacing")
-Set rMaster(6) = Sheet5.Range("bPoleSetback")
-Set rMaster(7) = Sheet5.Range("bArmLength")
-Set rMaster(8) = Sheet5.Range("bFixtureArrangement")
+'FLAG this should be updated to use the method in the finalMatrices module, read in from sheet one time here and passed as variable. Implementing within for now.
+Set rMaster(1) = wksRoadGeometry.Range("bNumLanes")
+Set rMaster(2) = wksRoadGeometry.Range("bLaneWidth")
+Set rMaster(3) = wksRoadGeometry.Range("bMedianWidth")
+Set rMaster(4) = wksRoadGeometry.Range("bMountingHeight")
+Set rMaster(5) = wksRoadGeometry.Range("bPoleSpacing")
+Set rMaster(6) = wksRoadGeometry.Range("bPoleSetback")
+Set rMaster(7) = wksRoadGeometry.Range("bArmLength")
+Set rMaster(8) = wksRoadGeometry.Range("bFixtureArrangement")
 
-Set rMaster(9) = Sheet5.Range("uNumLanes")
-Set rMaster(10) = Sheet5.Range("uLaneWidth")
-Set rMaster(11) = Sheet5.Range("uMedianWidth")
-Set rMaster(12) = Sheet5.Range("uMountingHeight")
-Set rMaster(13) = Sheet5.Range("uPoleSpacing")
-Set rMaster(14) = Sheet5.Range("uPoleSetback")
-Set rMaster(15) = Sheet5.Range("uArmLength")
-Set rMaster(16) = Sheet5.Range("uFixtureArrangement")
+Set rMaster(9) = wksRoadGeometry.Range("uNumLanes")
+Set rMaster(10) = wksRoadGeometry.Range("uLaneWidth")
+Set rMaster(11) = wksRoadGeometry.Range("uMedianWidth")
+Set rMaster(12) = wksRoadGeometry.Range("uMountingHeight")
+Set rMaster(13) = wksRoadGeometry.Range("uPoleSpacing")
+Set rMaster(14) = wksRoadGeometry.Range("uPoleSetback")
+Set rMaster(15) = wksRoadGeometry.Range("uArmLength")
+Set rMaster(16) = wksRoadGeometry.Range("uFixtureArrangement")
                 
 For iCheck = LBound(rMaster) To UBound(rMaster)
     If IsEmpty(rMaster(iCheck).Value) Then missingFlag = True

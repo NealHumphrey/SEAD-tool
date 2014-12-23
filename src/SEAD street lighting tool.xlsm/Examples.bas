@@ -12,10 +12,10 @@ Dim ExNumber As Integer
 Application.Calculation = xlCalculationManual
     
     Range = Sheet16.Range("EX_RG_Range").Value
-    Sheet5.Range("IN_RG_Brange").Value = Range
+    wksRoadGeometry.Range("IN_RG_Brange").Value = Range
     
     Range = Sheet16.Range("EX_RG_Range").Value
-    Sheet5.Range("IN_RG_Urange").Value = Range
+    wksRoadGeometry.Range("IN_RG_Urange").Value = Range
     
     Range = Sheet16.Range("EX_LS_Range").Value
     Sheet7.Range("IN_LS_range").Value = Range

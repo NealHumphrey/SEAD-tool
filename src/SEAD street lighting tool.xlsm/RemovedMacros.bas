@@ -54,7 +54,7 @@ GULrow1 = 79
     'Write results to SResultsGrid sheet
     column = 3
     
-        With Sheet22
+        With wksLuminanceOutputCIE
             'illuminance
             Grid = .Range(.Cells(GRIrow1, column), .Cells(GRIrow1 + 18, column + 20))
             .Range(.Cells(GBIrow1, column), .Cells(GBIrow1 + 18, column + 20)) = Grid
@@ -88,7 +88,7 @@ GULrow1 = 79
 
     'Write results to the SResultsGrid sheet
         column = 3
-        With Sheet22
+        With wksLuminanceOutputCIE
             'illuminance
             Grid = .Range(.Cells(GRIrow1, column), .Cells(GRIrow1 + 18, column + 20))
             .Range(.Cells(GUIrow1, column), .Cells(GUIrow1 + 18, column + 20)) = Grid

@@ -54,6 +54,7 @@ lastRow = Sheets("FixtureData").Range("B17").Value
 lastCol = Sheets("FixtureData").Cells(firstRow, Sheets("FixtureData").Columns.count).End(xlToLeft).column
 Sheets("FixtureData").Select
 
+'FLAG this should be moved up one call stack level, so that it is done only once per fixture (not for every fixture instance in the range)
 'Transfer the angle data to appropriate cells. table...2 is dimensioned using spreadsheet dimensions, and then values are transferred to table..1 which are 1-d
 tablePhi2() = Range(Cells(firstRow + 1, 1), Cells(lastRow, 1))        'values in Column A
 tableGamma2() = Range(Cells(firstRow, 2), Cells(firstRow, lastCol))       'Values in first row of intensity table

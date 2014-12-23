@@ -13,22 +13,51 @@ Dim calcMethod As String, poleconfig As String
 
 
 'Clearing all illuminance and luminance sheets
-Sheets("Illuminance Calcs").Select
-Rows("12:12").Select
-Range(Selection, Selection.End(xlDown)).Select
-Selection.ClearContents
-Range("A1").Select
-Sheets("Luminance Calcs").Select
-Rows("12:12").Select
-Range(Selection, Selection.End(xlDown)).Select
-Selection.ClearContents
-Range("A1").Select
-Sheets("Luminance Calcs CIE").Select
-Rows("12:5000").Select
-Selection.ClearContents
-Range("A1").Select
+wksIlluminanceOutput.Rows("12:5000").ClearContents
+wksLuminanceOutput.Rows("12:5000").ClearContents
+wksLuminanceOutputCIE.Rows("12:5000").ClearContents
 
-'Taking road geometry values for Baseline vs. Upgrade
+'geometryValues is an array to hold all of the data about the road geometry. This makes it easier to pass it in/out of subroutines
+Dim geometryValues()
+ReDim geometryValues(0 To 10, 0 To 2)
+geometryValues(0, 0) = "Variable Name"
+geometryValues(0, 1) = "Baseline"
+geometryValues(0, 2) = "Upgrade"
+
+geometryValues(1, 0) = "NumLanes"
+geometryValues(2, 0) = "LaneWidth"
+geometryValues(3, 0) = "MedianWidth"
+geometryValues(4, 0) = "MountingHeight"
+geometryValues(5, 0) = "PoleSpacing"
+geometryValues(6, 0) = "PoleSetback"
+geometryValues(7, 0) = "ArmLength"
+geometryValues(8, 0) = "FixtureArrangement"
+
+ExitFlag = False
+With wksRoadGeometry
+    'Add the baseline values to the array
+    geometryValues(1, 1) = .Range("bNumLanes").Value
+    geometryValues(2, 1) = .Range("bLaneWidth").Value
+    geometryValues(3, 1) = .Range("bMedianWidth").Value
+    geometryValues(4, 1) = .Range("bMountingHeight").Value
+    geometryValues(5, 1) = .Range("bPoleSpacing").Value
+    geometryValues(6, 1) = .Range("bPoleSetback").Value
+    geometryValues(7, 1) = .Range("bArmLength").Value
+    If VarType(.Range("bFixtureArrangement").Value) = vbError Then ExitFlag = True Else geometryValues(8, 1) = .Range("bFixtureArrangement").Value
+    
+    'Add the upgrade values to the array
+    geometryValues(1, 2) = .Range("uNumLanes").Value
+    geometryValues(2, 2) = .Range("uLaneWidth").Value
+    geometryValues(3, 2) = .Range("uMedianWidth").Value
+    geometryValues(4, 2) = .Range("uMountingHeight").Value
+    geometryValues(5, 2) = .Range("uPoleSpacing").Value
+    geometryValues(6, 2) = .Range("uPoleSetback").Value
+    geometryValues(7, 2) = .Range("uArmLength").Value
+    If VarType(.Range("uFixtureArrangement").Value) = vbError Then ExitFlag = True Else geometryValues(8, 2) = .Range("uFixtureArrangement").Value
+End With
+'FLAG debug - just make sure the above geometryValues code is working; replace code below.
+
+'FLAG this should be replaced with geometryValues array. Taking road geometry values for Baseline vs. Upgrade
 If Sheets("FixtureData").Range("Base_Upgrade_Choice").Value = "Baseline" Then
     ExitFlag = False
     NumberOfLanes = Sheets("Road Geometry").Range("bNumLanes").Value
@@ -89,14 +118,6 @@ gridlength = TotalGridLength(calcMethod, FixtureHeight, polespacing)
 fixtureX = FixturePosition(NumberOfLanes, poleconfig, MedianLength, polespacing, lanewidth, polesetback, ArmLength, gridlength)(0)
 fixtureY = FixturePosition(NumberOfLanes, poleconfig, MedianLength, polespacing, lanewidth, polesetback, ArmLength, gridlength)(1)
 '**FLAG performance speedup - FixturePosition function recalculates each time it is called
-
-'Tilt------------------------
-'Old Way
-'tiltDegrees = 10
-'tiltRadians = tiltDegrees * WorksheetFunction.Pi / 180
-'Dim rayLength As Double, extraY As Double
-'rayLength = FixtureHeight / Cos(tiltRadians)    'ray is the imaginary line extending perpendicularly out of the fixture. If the tilt is zero, this is the same as fixture height.
-'extraY = FixtureHeight * Tan(tiltRadians)       'Additional distance along cross-road axis due to tilt. X is along the road. Y is across the road.
 
 'new way
 tiltOnX = 30 / 180 * WorksheetFunction.Pi        'the up down tilt
@@ -222,7 +243,6 @@ If calcMethod = "IES" Then
             rTarget.Resize(UBound(aOutput, 1), UBound(aOutput, 2)) = aOutput
             
         End If
-        
     Next
     
     '*************************** got luminance and illuminance matrices at every grid point by every fixture till now *********
