@@ -110,14 +110,15 @@ pbProgBar.Progress = 0.1
 
         'counter for how many fixtures you've run
         count = 1
-        Application.ScreenUpdating = False
+        pbProgBar.Progress = count
 
     '--------run the upgrade fixtures --------------
+    Sheet2.Range("Base_Upgrade_Choice") = "Upgrade"
     'For each fixture with an 'x' on it in the 'Fixtures' tab, calculate the results
-    'Sheet3.Range("Base_Upgrade_Choice").Value = "Upgrade"
+
     'last row on the results tab (find after writing the baseline to row 4)
     lastRow = Sheet10.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
-    Sheets("FixtureData").Range("A6") = "Upgrade"
+
 
     For i = FirstRow13 + 1 To LastRow13
         'Check row for an x to decide whether to run or not
@@ -125,11 +126,7 @@ pbProgBar.Progress = 0.1
             'do nothing, go to next row
         ElseIf Sheet13.Cells(i, 2) = "x" Or Sheet13.Cells(i, 2) = "X" Then
             Application.Calculation = xlCalculationAutomatic
-            'Update fixture counter box (currently disabled)
-            'Sheet10.Range("count_fixturerun") = count
-            Application.ScreenUpdating = True
-            Application.ScreenUpdating = False
-            
+
             'Write the number of the fixture in the array to the FixtureData tab to change calculations
             FixtureChoice = Application.WorksheetFunction.Match(Sheet13.Cells(i, 3), Range("FixtureChoices"), 0)
             Range("Ufixturechoice") = FixtureChoice
@@ -198,9 +195,6 @@ pbProgBar.Progress = 0.1
             count = count + 1
             pbProgBar.Progress = count
         End If
-    
-    'Update the progress bar
-
     Next i
 
     pbProgBar.Hide

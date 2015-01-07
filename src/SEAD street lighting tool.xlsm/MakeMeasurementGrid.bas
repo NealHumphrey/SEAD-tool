@@ -33,9 +33,10 @@ GridSpacing = GridSpace(calculationmethod, polespacing)
 ' Assigning X values
 If calculationmethod = "CIE" Then
 Xvalues(0) = GridSpacing / 2
-Else
+Else 'IES
 Xvalues(0) = GridSpacing / 2
 End If
+
 For i = 1 To numberOfGridPoints
 Xvalues(i) = Xvalues(i - 1) + GridSpacing
 Next
@@ -65,7 +66,7 @@ If calculationmethod = "IES" Then
 ' if CIE method
 Else
     Yvalues(0) = lanewidth / 6
-    flagformedian = True
+    flagformedian = True            'FLAG this might be an error that prevents CIE method from having odd number of lanes
     For i = 1 To NumberOfYvalues - 1
         Yvalues(i) = Yvalues(i - 1) + (lanewidth / 3)
         'Adding median length for lanes on otherside

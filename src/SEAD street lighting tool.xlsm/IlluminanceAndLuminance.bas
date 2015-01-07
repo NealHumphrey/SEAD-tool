@@ -20,10 +20,12 @@ wksLuminanceOutputCIE.Rows("12:5000").ClearContents
 'geometryValues is an array to hold all of the data about the road geometry. This makes it easier to pass it in/out of subroutines
 Dim geometryValues()
 ReDim geometryValues(0 To 10, 0 To 2)
+'Just to help users remember what is in the array, adding header data
+'column headers in row 0
 geometryValues(0, 0) = "Variable Name"
 geometryValues(0, 1) = "Baseline"
 geometryValues(0, 2) = "Upgrade"
-
+'row headers in column 0
 geometryValues(1, 0) = "NumLanes"
 geometryValues(2, 0) = "LaneWidth"
 geometryValues(3, 0) = "MedianWidth"
@@ -55,34 +57,26 @@ With wksRoadGeometry
     geometryValues(7, 2) = .Range("uArmLength").Value
     If VarType(.Range("uFixtureArrangement").Value) = vbError Then ExitFlag = True Else geometryValues(8, 2) = .Range("uFixtureArrangement").Value
 End With
-'FLAG debug - just make sure the above geometryValues code is working; replace code below.
 
-'FLAG this should be replaced with geometryValues array. Taking road geometry values for Baseline vs. Upgrade
+
+'FLAG this should be eliminated once fully transitioned to the geometryValues array. This section exists for compatibility with methods that have not yet been updated to handle the geometryValues array. Those subs should be refactored for simplification, and then this section can be removed.
+Dim intBaselineUpgradeChoice
 If Sheets("FixtureData").Range("Base_Upgrade_Choice").Value = "Baseline" Then
-    ExitFlag = False
-    NumberOfLanes = Sheets("Road Geometry").Range("bNumLanes").Value
-    lanewidth = Sheets("Road Geometry").Range("bLaneWidth").Value
-    MedianLength = Sheets("Road Geometry").Range("bMedianWidth").Value
-    FixtureHeight = Sheets("Road Geometry").Range("bMountingHeight").Value
-    polespacing = Sheets("Road Geometry").Range("bPoleSpacing").Value
-    polesetback = Sheets("Road Geometry").Range("bPoleSetback").Value
-    ArmLength = Sheets("Road Geometry").Range("bArmLength").Value
-    If VarType(Sheets("Road Geometry").Range("bFixtureArrangement").Value) = vbError Then
-        ExitFlag = True
-    Else
-        poleconfig = Sheets("Road Geometry").Range("bFixtureArrangement").Value
-    End If
-ElseIf Sheets("FixtureData").Range("A6").Value = "Upgrade" Then
-    ExitFlag = False
-    NumberOfLanes = Sheets("Road Geometry").Range("uNumLanes").Value
-    lanewidth = Sheets("Road Geometry").Range("uLaneWidth").Value
-    MedianLength = Sheets("Road Geometry").Range("uMedianWidth").Value
-    FixtureHeight = Sheets("Road Geometry").Range("uMountingHeight").Value
-    polespacing = Sheets("Road Geometry").Range("uPoleSpacing").Value
-    polesetback = Sheets("Road Geometry").Range("uPoleSetback").Value
-    ArmLength = Sheets("Road Geometry").Range("uArmLength").Value
-    poleconfig = Sheets("Road Geometry").Range("uFixtureArrangement").Value
+    intBaselineUpgradeChoice = 1
+ElseIf Sheets("FixtureData").Range("Base_Upgrade_Choice").Value = "Upgrade" Then
+    intBaselineUpgradeChoice = 2
 End If
+NumberOfLanes = geometryValues(1, intBaselineUpgradeChoice)
+lanewidth = geometryValues(2, intBaselineUpgradeChoice)
+MedianLength = geometryValues(3, intBaselineUpgradeChoice)
+FixtureHeight = geometryValues(4, intBaselineUpgradeChoice)
+polespacing = geometryValues(5, intBaselineUpgradeChoice)
+polesetback = geometryValues(6, intBaselineUpgradeChoice)
+ArmLength = geometryValues(7, intBaselineUpgradeChoice)
+poleconfig = geometryValues(8, intBaselineUpgradeChoice)
+'end section of refactor
+
+'End sub if there is an error in the data entry for pole configuration
 If ExitFlag = True Then
     ErrorMessage = Sheet25.Range("poleconfigError").Value
     MsgBox (ErrorMessage)
@@ -117,13 +111,13 @@ Dim fixtureY()
 gridlength = TotalGridLength(calcMethod, FixtureHeight, polespacing)
 fixtureX = FixturePosition(NumberOfLanes, poleconfig, MedianLength, polespacing, lanewidth, polesetback, ArmLength, gridlength)(0)
 fixtureY = FixturePosition(NumberOfLanes, poleconfig, MedianLength, polespacing, lanewidth, polesetback, ArmLength, gridlength)(1)
-'**FLAG performance speedup - FixturePosition function recalculates each time it is called
+'**FLAG small performance speedup - FixturePosition function recalculates each time it is called
 
-'new way
-tiltOnX = 30 / 180 * WorksheetFunction.Pi        'the up down tilt
+'Tilt--------------------------
+tiltOnX = 0 / 180 * WorksheetFunction.Pi        'the up down tilt
 tiltOnY = 0 / 180 * WorksheetFunction.Pi        'towards or away from observer, i.e. twisting the arm
 tiltOnZ = 0 / 180 * WorksheetFunction.Pi        'twisting the pole
-'Tilt--------------------------
+
 
 ' Every array prefixed L is used for Illuminance calculations and prefixed with R is used for Luminance calculations
 Dim larray()
@@ -168,7 +162,7 @@ If calcMethod = "IES" Then
     For k = LBound(fixtureX) To UBound(fixtureX)
         'Angle calculations
         phi = anglePhi(fixtureX(k), fixtureY(k), outputXY, polespacing, FixtureHeight, 0, 0, 0, calcMethod)
-        phiArrayForITable = anglePhiWithTilt(fixtureX(k), fixtureY(k), outputXY, polespacing, FixtureHeight, tiltOnX, tiltOnY, tiltOnZ, calcMethod)
+        phiArrayForITable = anglePhiWithTilt(fixtureX(k), fixtureY(k), outputXY, tiltOnX, tiltOnY, tiltOnZ, calcMethod, intBaselineUpgradeChoice, geometryValues())
         gammaArray = angleGamma(fixtureX(k), fixtureY(k), outputXY, polespacing, FixtureHeight, 0, 0, 0, calcMethod)
         gammaArrayForITable = angleGammaWithTilt(fixtureX(k), fixtureY(k), outputXY, polespacing, FixtureHeight, tiltOnX, tiltOnY, tiltOnZ, calcMethod)
         betaArray = angleBeta(phi(), calcMethod, fixtureX(k), fixtureY(k), outputXY, polespacing, lanewidth, FixtureHeight, 0)
@@ -313,7 +307,7 @@ ElseIf calcMethod = "CIE" Then
         
         'getting angle matrices
         phi = anglePhi(fixtureX(k), fixtureY(k), outputXY, polespacing, FixtureHeight, 0, 0, 0, calcMethod)
-        phiArrayForITable = anglePhiWithTilt(fixtureX(k), fixtureY(k), outputXY, polespacing, FixtureHeight, tiltOnX, tiltOnY, tiltOnZ, calcMethod)
+        phiArrayForITable = anglePhiWithTilt(fixtureX(k), fixtureY(k), outputXY, tiltOnX, tiltOnY, tiltOnZ, calcMethod, intBaselineUpgradeChoice, geometryValues)
         gammaArray = angleGamma(fixtureX(k), fixtureY(k), outputXY, polespacing, FixtureHeight, 0, 0, 0, calcMethod)
         gammaArrayForITable = angleGammaWithTilt(fixtureX(k), fixtureY(k), outputXY, polespacing, FixtureHeight, tiltOnX, tiltOnY, tiltOnZ, calcMethod)
         betaArray = angleBeta(phi(), calcMethod, fixtureX(k), fixtureY(k), outputXY, polespacing, lanewidth, FixtureHeight, yo)
