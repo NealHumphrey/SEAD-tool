@@ -60,7 +60,7 @@ Set pbProgBar = New FProgressBarIFace
 pbProgBar.Title = Sheet25.Range("tStatusHeader")
 pbProgBar.Text = Sheet25.Range("tPerformingCalcs")
 pbProgBar.Min = 0
-pbProgBar.Max = TotalFixtures + 1
+pbProgBar.max = TotalFixtures + 1
 pbProgBar.Progress = 0
 pbProgBar.Show
 pbProgBar.Progress = 0.1

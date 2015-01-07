@@ -9,7 +9,7 @@ Set pbProgBar = New FProgressBarIFace
 pbProgBar.Title = "Creating file..."
 pbProgBar.Text = "Creating output file..."
 pbProgBar.Min = 0
-pbProgBar.Max = 1
+pbProgBar.max = 1
 pbProgBar.Progress = 1
 pbProgBar.Show
 pbProgBar.Progress = 0.1

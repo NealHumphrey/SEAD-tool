@@ -87,7 +87,7 @@ Set pbProgBar = New FProgressBarIFace
 pbProgBar.Title = Sheet25.Range("tStatusHeader")
 pbProgBar.Text = Sheet25.Range("tUploadingFixtures")
 pbProgBar.Min = 0
-pbProgBar.Max = lastRow - 20
+pbProgBar.max = lastRow - 20
 pbProgBar.Progress = 0
 pbProgBar.Show
 pbProgBar.Progress = 0.1

@@ -25,7 +25,7 @@ Sub ProgressFormInterface()
     pbProgBar.Title = "Professional Excel Development"
     pbProgBar.Text = "Preparing report, please wait..."
     pbProgBar.Min = 0
-    pbProgBar.Max = 1000
+    pbProgBar.max = 1000
     pbProgBar.Progress = 0
     pbProgBar.Show
 
