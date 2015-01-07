@@ -114,7 +114,8 @@ fixtureY = FixturePosition(NumberOfLanes, poleconfig, MedianLength, polespacing,
 '**FLAG small performance speedup - FixturePosition function recalculates each time it is called
 
 'Tilt--------------------------
-tiltOnX = 0 / 180 * WorksheetFunction.Pi        'the up down tilt
+tiltDegreesX = Sheets("FixtureData").Range("selectedTilt")
+tiltOnX = titlDegreesX / 180 * WorksheetFunction.Pi        'the up down tilt
 tiltOnY = 0 / 180 * WorksheetFunction.Pi        'towards or away from observer, i.e. twisting the arm
 tiltOnZ = 0 / 180 * WorksheetFunction.Pi        'twisting the pole
 
@@ -279,23 +280,24 @@ If calcMethod = "IES" Then
 '******************************************************************************************************
 ElseIf calcMethod = "CIE" Then
     '-----------
-    'Luminance
+    'Luminance is calculated first - Illuminance in CIE uses a different (reduced) measurement grid.
     '-----------
     'running for all observer locations
-    For m = 1 To NumberOfLanes
-        yo = (2 * m - 1) * lanewidth / 2                    'yo = y of observer, in the center of each lane in turn
+    'Different luminance for different observer location is put into a sheet called Luminance Calcs CIE
+    'Least average values and uniformity values are taken from this sheet into main luminance calcs sheet
+    Dim observerLocation As Integer
+    For observerLocation = 1 To NumberOfLanes       'Place an observer in each lane in turn, and recalculate everything
+        'Determine observer coordinates
+        yo = (2 * observerLocation - 1) * lanewidth / 2                    'yo = y of observer, in the center of each lane in turn
         If yo > NumberOfLanes * lanewidth / 2 Then
-        yo = yo + MedianLength
+            yo = yo + MedianLength
         End If
-        
-        ' Running for all fixtures
-        For k = LBound(fixtureX) To UBound(fixtureX)
-        
-            ' running for all observer locations.
-            'Different luminance for different observer location is put into a sheet called Luminance Calcs CIE
-            ' Least average values and uniformity values are taken from this sheet into main luminance calcs sheet
-            
-            'getting angle matrices
+    
+    '------------------------------
+    'Calculate Luminance at each grid point; these will be summed afterwards. k iterates through each fixture
+    '------------------------------
+        For k = LBound(fixtureX) To UBound(fixtureX)                'each fixture
+            'Angle calculations
             phi = anglePhiWithTilt(fixtureX(k), fixtureY(k), outputXY, 0, 0, 0, calcMethod, intBaselineUpgradeChoice, geometryValues())     'use zero degree tilt for the reflectance calculations
             phiArrayForITable = anglePhiWithTilt(fixtureX(k), fixtureY(k), outputXY, tiltOnX, tiltOnY, tiltOnZ, calcMethod, intBaselineUpgradeChoice, geometryValues)   'use tilt for the light intensity lookup
             gammaArray = angleGammaWithTilt(fixtureX(k), fixtureY(k), outputXY, 0, 0, 0, calcMethod, intBaselineUpgradeChoice, geometryValues)
@@ -313,30 +315,23 @@ ElseIf calcMethod = "CIE" Then
             'Calculating luminance
             temparray2 = Lum(larray, gammaArray, Rarray, LLF, FixtureHeight)
             luminanceFixture(k) = temparray2
-        
         Next k  'next fixture
         
-        ' sum of luminnance from all fixtures
+    '-----------------------------------------------------
+    'Sum up the contributions of all the relevant fixtures
+    '-----------------------------------------------------
         ReDim RsumArray(LBound(gammaArray(), 1) To UBound(gammaArray(), 1), LBound(gammaArray(), 2) To UBound(gammaArray(), 2))
-        
         For i = LBound(luminanceFixture) To UBound(luminanceFixture)
         RthisArray = luminanceFixture(i)
             For j = LBound(RsumArray, 1) To UBound(RsumArray, 1)
                 For k = LBound(RsumArray, 2) To UBound(RsumArray, 2)
-                    ' Summing up luminace at each grid point from one observer location
-                    RsumArray(j, k) = RsumArray(j, k) + RthisArray(j, k)
+                    RsumArray(j, k) = RsumArray(j, k) + RthisArray(j, k) 'Luminance, grid point j and k matches between thisArray and sumArray
                 Next k
             Next j
         Next i
         
-        'getting luminance for one oberserver location into excel sheet
+        'Write results for one observer location into excel sheet
         Sheets("Luminance Calcs CIE").Range("F" & rownum).Resize(UBound(RsumArray, 1) - LBound(RsumArray, 1) + 1, UBound(RsumArray, 2) - LBound(RsumArray, 2) + 1).Value = RsumArray
-        
-        Dim c As Integer, sc As Integer, colNo As Integer, arr As Variant
-        c = UBound(RsumArray, 2) + 1        'counter used to get mid-lane gridpoint
-        colNo = 53                          'used for outputting the min/max of each lane to the sheet
-        arr = RsumArray                     'arr is used to get all the grid points in one direction
-        ReDim Preserve arr(LBound(RsumArray, 1) To UBound(RsumArray, 1), 1)     'FLAG I think that the Preserve can be removed, and the arr = rSumArray can also be removed, since the values for arr get assigned in the for loop below.
         
         '-------------------------------------
         'Find the summary statistics for this observer location (min, max, uniformity, etc.)
@@ -351,6 +346,12 @@ ElseIf calcMethod = "CIE" Then
         
         'Longitudinal uniformity is calculated along the centerline of each lane, rather than across the whole grid, and the lowest uniformity is used.
         'FLAG per section 8.3 this should only be done for the particular lane that the observer is in, because it says the observer should be in line with the midpoint. "for sc..." should instead be to determine which lane should be picked, and the overall max calc needs to be rethought.
+        Dim c As Integer, sc As Integer, colNo As Integer, arr As Variant
+        c = UBound(RsumArray, 2) + 1        'counter used to get mid-lane gridpoint
+        colNo = 53                          'used for outputting the min/max of each lane to the sheet
+        arr = RsumArray                     'arr is used to get all the grid points in one direction
+        ReDim Preserve arr(LBound(RsumArray, 1) To UBound(RsumArray, 1), 1)     'FLAG I think that the Preserve can be removed, and the arr = rSumArray can also be removed, since the values for arr get assigned in the for loop below.
+        
         For sc = 2 To c - 1 Step 3
             Dim currentmax As Double, currentmin As Double, currentratio As Double
             arr = Application.WorksheetFunction.Index(RsumArray, 0, sc)                                 'get all grid points for one row, the middle of current lane (sc)
@@ -377,27 +378,25 @@ ElseIf calcMethod = "CIE" Then
         Sheets("Luminance Calcs CIE").Range("d" & rownum).Value = currentLaneMinAvgUniformity
         Sheets("Luminance Calcs CIE").Range("e" & rownum).Value = minRatio      'the lowest across all midpoints (this might be removed because it looks like only one lane should be used per observer location, see FLAG above)
         
-        
         rownum = rownum + UBound(RsumArray, 1) - LBound(RsumArray, 1) + 1           'Values for the next lane get placed after all grid points for current lane
-    Next m 'next lane
+    Next observerLocation 'next lane
     
-    'Add section headers to the sheet
-    Dim t1 As Integer
-    Dim s1 As Integer
-    s1 = 6
-    For t1 = 1 To NumberOfLanes
-        Sheets("Luminance Calcs CIE").Cells(12, s1).Value = "L " & t1 & " - 1/6"
-        Sheets("Luminance Calcs CIE").Cells(12, s1 + 1).Value = "L " & t1 & " - 3/6"
-        Sheets("Luminance Calcs CIE").Cells(12, s1 + 2).Value = "L " & t1 & " - 5/6"
-        s1 = s1 + 3
-    Next t1
+        'Add section headers to the sheet
+        Dim t1 As Integer
+        Dim s1 As Integer
+        s1 = 6
+        For t1 = 1 To NumberOfLanes
+            Sheets("Luminance Calcs CIE").Cells(12, s1).Value = "L " & t1 & " - 1/6"
+            Sheets("Luminance Calcs CIE").Cells(12, s1 + 1).Value = "L " & t1 & " - 3/6"
+            Sheets("Luminance Calcs CIE").Cells(12, s1 + 2).Value = "L " & t1 & " - 5/6"
+            s1 = s1 + 3
+        Next t1
     
-    '-----------
-    'Illuminance
-    '-----------
-    'Grid changed to take only 3 longitudnal points across road instead of lane.
-    LLF = Sheets("FixtureData").Range("H6").Value
     
+    '-------------------------------------
+    'Illuminance is calculted second, as it uses a different measurement grid configuration
+    '-------------------------------------
+    'Illuminance grid changed to take only 3 longitudinal points across road instead of lane.
     If MedianLength = 0 Then
         Dim outputY1(2)
         outputY1(0) = (lanewidth * NumberOfLanes + MedianLength) / 6
@@ -420,31 +419,32 @@ ElseIf calcMethod = "CIE" Then
         phi = anglePhiWithTilt(fixtureX(k), fixtureY(k), outputXY, 0, 0, 0, calcMethod, intBaselineUpgradeChoice, geometryValues())
         gammaArray = angleGammaWithTilt(fixtureX(k), fixtureY(k), outputXY, 0, 0, 0, calcMethod, intBaselineUpgradeChoice, geometryValues)
         betaArray = angleBeta(phi(), calcMethod, fixtureX(k), fixtureY(k), outputXY, polespacing, lanewidth, FixtureHeight, 0)
+        phiArrayForITable = anglePhiWithTilt(fixtureX(k), fixtureY(k), outputXY, tiltOnX, tiltOnY, tiltOnZ, calcMethod, intBaselineUpgradeChoice, geometryValues)   'use tilt for the light intensity lookup
+        gammaArrayForITable = angleGammaWithTilt(fixtureX(k), fixtureY(k), outputXY, tiltOnX, tiltOnY, tiltOnZ, calcMethod, intBaselineUpgradeChoice, geometryValues)
         
-        'removing all the luminaries outside 5H distance
+        'removing effect of all the luminaries outside 5H distance
         If outputXY(0)(LBound(gammaArray)) - fixtureX(k) > 5 * FixtureHeight Or fixtureX(k) - outputXY(0)(UBound(gammaArray)) > 5 * FixtureHeight Then
             LLF = 0
         Else
             LLF = Sheets("FixtureData").Range("H6").Value
         End If
         
-        larray = LintensityMatrix(ngp, poleconfig, fixtureX(k), fixtureY(k), outputXY, polespacing, FixtureHeight, calcMethod, phi, gammaArray)
+        'Luminous intensity calculations using quadratic interpolation (includes tilt)
+        larray = LintensityMatrix(ngp, poleconfig, fixtureX(k), fixtureY(k), outputXY, polespacing, FixtureHeight, calcMethod, phiArrayForITable, gammaArrayForITable)
         LarrayMatrix(k) = larray
         
+        ' Illuminance at every grid point by fixture k
         tempArray1 = Illum(larray, gammaArray, LLF, FixtureHeight)
         illuminanceFixture(k) = tempArray1
     Next
     
-    '*************************** got luminance and illuminance matrices at every grid point by every fixture till now *********
-    ' sum of luminnance from all fixtures
+    '-----------------------------------------------------
+    'Sum up the contributions of all the relevant fixtures
+    '-----------------------------------------------------
+    Erase LsumArray     'redundant to ReDim?
     ReDim LsumArray(LBound(gammaArray(), 1) To UBound(gammaArray(), 1), LBound(gammaArray(), 2) To UBound(gammaArray(), 2))
-    For p = LBound(gammaArray, 1) To UBound(gammaArray, 1)
-        For q = LBound(gammaArray, 2) To UBound(gammaArray, 2)
-            LsumArray(p, q) = 0
-            'RsumArray(p, q) = 0
-        Next q
-    Next p
-    
+
+    'Add up the contributions of all fixtures
     For i = LBound(illuminanceFixture) To UBound(illuminanceFixture)
     LthisArray = illuminanceFixture(i)
         For j = LBound(LsumArray, 1) To UBound(LsumArray, 1)
@@ -454,11 +454,13 @@ ElseIf calcMethod = "CIE" Then
         Next
     Next
     
+    '-----------------------------------------------------
+    'Output the values to the relevant sheet
+    '-----------------------------------------------------
     Sheets("Illuminance Calcs").[B13].Resize(UBound(LsumArray, 1) - LBound(LsumArray, 1) + 1, UBound(LsumArray, 2) - LBound(LsumArray, 2) + 1).Value = LsumArray
-    'Sheets("Luminance Calcs").[B13].Resize(UBound(RsumArray, 1) - LBound(RsumArray, 1) + 1, UBound(RsumArray, 2) - LBound(RsumArray, 2) + 1).Value = RsumArray
-        Sheets("Illuminance Calcs").Cells(12, 2).Value = "R - 1/6"
-        Sheets("Illuminance Calcs").Cells(12, 3).Value = "R - 3/6"
-        Sheets("Illuminance Calcs").Cells(12, 4).Value = "R - 5/6"
+    Sheets("Illuminance Calcs").Cells(12, 2).Value = "R - 1/6"
+    Sheets("Illuminance Calcs").Cells(12, 3).Value = "R - 3/6"
+    Sheets("Illuminance Calcs").Cells(12, 4).Value = "R - 5/6"
         
     If MedianLength > 0 Then
         Sheets("Illuminance Calcs").Cells(12, 5).Value = "R - 1/6"

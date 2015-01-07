@@ -339,3 +339,67 @@ Attribute VB_Name = "RemovedMacros"
 '
 '
 '
+'
+'Sub ReadSingleISOfile()
+''This macro works as of version 1.6.0; however, it does not allow for optional input to override defaults
+''Single upload option removed to simplify use of the tool, training, updates, etc.
+''Read in the text values from the Translation tab to ensure proper translation
+'isoprompt = Sheet25.Range("isoprompt")
+'ISOFixtureprompt = Sheet25.Range("isofixtureprompt")
+'ISOFixturetitle = Sheet25.Range("isofixturetitle")
+'ISOFixtureDefault = Sheet25.Range("isofixturedefault")
+'ISOTypeDefault = Sheet25.Range("isotypedefault")
+'ISOTypeTitle = Sheet25.Range("isotypetitle")
+'
+'ISOFixtureError = Sheet25.Range("ISOFixtureError")
+'ISOAngleError = Sheet25.Range("isoangleerror")
+'
+'
+'TooManyColumns = False 'test to see if the Candela data will fit - set to false initialy
+'OtherError = False 'again, set other error to false initially
+'
+'Select Case MsgBox(isoprompt, _
+'            vbOKCancel)
+'Case vbCancel
+'    Exit Sub
+'Case vbOK
+'    GetOpenFilename
+'    If filepath = False Then Exit Sub
+'    ISOpath = filepath
+'
+'    FixtureName = Application.InputBox(prompt:=ISOFixtureprompt, _
+'              Title:=ISOFixturetitle, Default:=ISOFixtureDefault)
+'    If FixtureName = False Then Exit Sub
+'
+'    'Change - should be better input box, drop down choices, form?***************************************************************
+'    FixtureType = Application.InputBox(prompt:=ISOTypeDefault, _
+'              Title:=ISOTypeTitle, Default:="HPS, LED or MH")
+'
+'    If FixtureType = False Then Exit Sub
+'    If FixtureType <> "LED" And FixtureType <> "HPS" And FixtureType <> "MH" Then
+'        MsgBox (ISOFixtureError)
+'        Exit Sub
+'    End If
+'
+'    'Initialize to defaults
+'    EquipmentCost = Range(FixtureType & "cost")
+'    InstallationCost = Range(FixtureType & "instcost")
+'    Rebate = 0
+'    MaintenanceCost = Range(FixtureType & "maintcost")
+'    MaintenanceInflation = Range(FixtureType & "maintinflate")
+'    LLD = Range(FixtureType & "LLD")
+'    LDD = Range(FixtureType & "DD")
+'    BF = Range(FixtureType & "BF")
+'
+'    ReadISOfile
+'
+'    'Error alerts
+'    If TooManyColumns = True Then
+'        MsgBox (ISOAngleError)
+'    ElseIf OtherError = True Then
+'        '********************************************************need to change to translated error message************************************************
+'        MsgBox (FixtureName & " could not be uploaded due to an error. Please check the file and ensure it is in the proper format, or choose another file. This file will be skipped.")
+'    End If
+'
+'End Select
+'End Sub

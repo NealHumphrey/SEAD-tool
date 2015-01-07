@@ -45,6 +45,7 @@ Dim tableBeta2()
 Dim tableTanGamma2()
 Dim tableRArray()
 
+'FLAG performance speed up - move this up a level so that it doesn't have to be called for every single fixture location.
 With Sheet12
     tableBeta2() = .Range("D5:W5")
     tableTanGamma2() = .Range("C6:C34")
