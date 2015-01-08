@@ -496,7 +496,9 @@ If CompatibleColumns = True Then
     Sheet13.Cells(LastRowSheet13 + 1, 16) = LLD
     Sheet13.Cells(LastRowSheet13 + 1, 17) = LDD
     Sheet13.Cells(LastRowSheet13 + 1, 18) = BF
-        
+    'skip column 19 for total depreciation formula
+    Sheet13.Cells(LastRowSheet13 + 1, 20) = BF
+    
     'Intro information
     Sheet2.Cells(StartRow, 2) = FixtureName
     Sheet2.Cells(StartRow + 1, 2) = Manufac

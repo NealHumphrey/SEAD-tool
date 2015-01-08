@@ -115,7 +115,7 @@ fixtureY = FixturePosition(NumberOfLanes, poleconfig, MedianLength, polespacing,
 
 'Tilt--------------------------
 tiltDegreesX = Sheets("FixtureData").Range("selectedTilt")
-tiltOnX = titlDegreesX / 180 * WorksheetFunction.Pi        'the up down tilt
+tiltOnX = tiltDegreesX / 180 * WorksheetFunction.Pi        'the up down tilt
 tiltOnY = 0 / 180 * WorksheetFunction.Pi        'towards or away from observer, i.e. twisting the arm
 tiltOnZ = 0 / 180 * WorksheetFunction.Pi        'twisting the pole
 
@@ -360,7 +360,7 @@ ElseIf calcMethod = "CIE" Then
             If currentmax <> 0 Then currentratio = currentmin / currentmax Else currentratio = 0        'Avoid the div0 error
             
             'identify lowest uniformity of all lanes
-            If overallmax Is Nothing Then overallmax = currentmax           'the first time through
+            If minRatio = 0 Then overallmax = currentmax          'the first time through
             If currentmax < minRatio Then minRatio = currentratio         'identifies the overall highest ratio by the time the for loop is over
             
             'Output data to the sheet (FLAG this could potentially be deleted, as long as it's not used elsewhere)

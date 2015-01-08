@@ -109,7 +109,13 @@ For i = istart To iend          'each grid point in the x direction
                  y * (Sin(tiltOnZ) * Sin(tiltOnY) - Cos(tiltOnZ) * Sin(tiltOnX) * Cos(tiltOnY)) + _
                  FixtureHeight * Cos(tiltOnX) * Cos(tiltOnY)
                     
-        gammaTemp = Atn(((xPrime ^ 2 + yPrime ^ 2) ^ 0.5) / HPrime) * 180 / WorksheetFunction.Pi
+        'Basic gamma calc yields angle between -90 and 90; needs to be converted to be between 0 and 180
+        If HPrime = 0 Then
+            gammaTemp = 90
+        Else
+            gammaTemp = Atn(((xPrime ^ 2 + yPrime ^ 2) ^ 0.5) / HPrime) * 180 / WorksheetFunction.Pi
+        End If
+        If HPrime < 0 Then gammaTemp = gammaTemp + 180
         gammaArray(i, j) = gammaTemp
         
         'saving the intermediate variables to array for debug purposes only - can export later if needed.
@@ -257,7 +263,11 @@ For j = 0 To numberOfY              'each grid point in the y direction
             y * (Sin(tiltOnZ) * Sin(tiltOnY) - Cos(tiltOnZ) * Sin(tiltOnX) * Cos(tiltOnY)) + _
             FixtureHeight * Cos(tiltOnX) * Cos(tiltOnY)
     
-    phiTemp = Atn(Abs(xPrime) / Abs(yPrime)) * 180 / WorksheetFunction.Pi     'FLAG does this need to be modified to handle the div0 error?
+    If yPrime <> 0 Then
+        phiTemp = Atn(Abs(xPrime) / Abs(yPrime)) * 180 / WorksheetFunction.Pi
+    Else
+        phiTemp = 90
+    End If
     
     'convert the angle if it is located behind the fixture
     If yPrime < 0 Then
