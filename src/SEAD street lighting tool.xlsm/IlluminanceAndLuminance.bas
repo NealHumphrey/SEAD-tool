@@ -352,31 +352,44 @@ ElseIf calcMethod = "CIE" Then
         arr = RsumArray                     'arr is used to get all the grid points in one direction
         ReDim Preserve arr(LBound(RsumArray, 1) To UBound(RsumArray, 1), 1)     'FLAG I think that the Preserve can be removed, and the arr = rSumArray can also be removed, since the values for arr get assigned in the for loop below.
         
-        For sc = 2 To c - 1 Step 3
-            Dim currentmax As Double, currentmin As Double, currentratio As Double
-            arr = Application.WorksheetFunction.Index(RsumArray, 0, sc)                                 'get all grid points for one row, the middle of current lane (sc)
-            currentmin = Application.WorksheetFunction.Min(arr)                                         'Min of this lane to sheet
-            currentmax = Application.WorksheetFunction.max(arr)                                         'Max of this lane to sheet
-            If currentmax <> 0 Then currentratio = currentmin / currentmax Else currentratio = 0        'Avoid the div0 error
-            
-            'identify lowest uniformity of all lanes
-            If minRatio = 0 Then overallmax = currentmax          'the first time through
-            If currentmax < minRatio Then minRatio = currentratio         'identifies the overall highest ratio by the time the for loop is over
-            
-            'Output data to the sheet (FLAG this could potentially be deleted, as long as it's not used elsewhere)
-            Sheets("Luminance Calcs CIE").Cells(rownum, colNo).Value = currentmin
-            Sheets("Luminance Calcs CIE").Cells(rownum + 1, colNo).Value = currentmax
-            Sheets("Luminance Calcs CIE").Cells(rownum + 2, colNo).Value = currentratio
-            
-            colNo = colNo + 1
+        For sc = 2 To c - 1 Step 3          'sc is which gridpoint to use, starting at 1. Check each midpoint and see if it matches the location of the observer; we calculate longitudinal uniformity for the lane that the observer is located.
+            gridlineY = outputXY(1)(sc - 1) 'outputXY uses a base zero, so need to subtract 1 from sc to get a match
+            If Abs(gridlineY - yo) < 0.0001 Then        'Doubles can't be compared consistently for equals. See if we're in the same lane as the observer.
+                rowForLongUniformity = sc
+            End If
         Next sc
+        arr = Application.WorksheetFunction.Index(RsumArray, 0, rowForLongUniformity)                                 'get all grid points for one row, the middle of current lane (sc)
+        currentmin = Application.WorksheetFunction.Min(arr)                                         'Min of this lane to sheet
+        currentmax = Application.WorksheetFunction.max(arr)                                         'Max of this lane to sheet
+        If currentmax <> 0 Then minRatio = currentmin / currentmax Else minRatio = 0                'Avoid the div0 error; calculating longitudinal uniformity
+        
+
+'FLAG deprecated method, remove if new method works
+'        For sc = 2 To c - 1 Step 3
+'            Dim currentmax As Double, currentmin As Double, currentratio As Double
+'            arr = Application.WorksheetFunction.Index(RsumArray, 0, sc)                                 'get all grid points for one row, the middle of current lane (sc)
+'            currentmin = Application.WorksheetFunction.Min(arr)                                         'Min of this lane to sheet
+'            currentmax = Application.WorksheetFunction.max(arr)                                         'Max of this lane to sheet
+'            If currentmax <> 0 Then currentratio = currentmin / currentmax Else currentratio = 0        'Avoid the div0 error
+'
+'            'identify lowest uniformity of all lanes
+'            If minRatio = 0 Then overallmax = currentmax          'the first time through
+'            If currentmax < minRatio Then minRatio = currentratio         'identifies the overall highest ratio by the time the for loop is over
+'
+'            'Output data to the sheet (FLAG this could potentially be deleted, as long as it's not used elsewhere)
+'            Sheets("Luminance Calcs CIE").Cells(rownum, colNo).Value = currentmin
+'            Sheets("Luminance Calcs CIE").Cells(rownum + 1, colNo).Value = currentmax
+'            Sheets("Luminance Calcs CIE").Cells(rownum + 2, colNo).Value = currentratio
+'
+'            colNo = colNo + 1
+'        Next sc
 
         'Output the summary stats to the sheet
         Sheets("Luminance Calcs CIE").Range("a" & rownum).Value = currentLaneAvg
         Sheets("Luminance Calcs CIE").Range("b" & rownum).Value = currentLaneMin
         Sheets("Luminance Calcs CIE").Range("c" & rownum).Value = currentLaneMax
         Sheets("Luminance Calcs CIE").Range("d" & rownum).Value = currentLaneMinAvgUniformity
-        Sheets("Luminance Calcs CIE").Range("e" & rownum).Value = minRatio      'the lowest across all midpoints (this might be removed because it looks like only one lane should be used per observer location, see FLAG above)
+        Sheets("Luminance Calcs CIE").Range("e" & rownum).Value = minRatio      'longitudinal uniformity
         
         rownum = rownum + UBound(RsumArray, 1) - LBound(RsumArray, 1) + 1           'Values for the next lane get placed after all grid points for current lane
     Next observerLocation 'next lane

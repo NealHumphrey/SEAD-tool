@@ -22,14 +22,14 @@
    <x:AutoLine>False</x:AutoLine>
    <x:FmlaMacro>[0]!ListBox1860_Change</x:FmlaMacro>
    <x:FmlaLink>FixtureData!$C$18</x:FmlaLink>
-   <x:Val>34</x:Val>
+   <x:Val>0</x:Val>
    <x:Min>0</x:Min>
-   <x:Max>34</x:Max>
+   <x:Max>30</x:Max>
    <x:Inc>1</x:Inc>
    <x:Page>8</x:Page>
    <x:Dx>22</x:Dx>
    <x:FmlaRange>FixtureChoices</x:FmlaRange>
-   <x:Sel>41</x:Sel>
+   <x:Sel>2</x:Sel>
    <x:NoThreeD2/>
    <x:SelType>Single</x:SelType>
    <x:LCT>Normal</x:LCT>
