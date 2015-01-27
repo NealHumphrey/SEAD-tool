@@ -104,10 +104,10 @@ For row = 21 To lastRow
     FixtureName = Sheet21.Cells(row, 2)
     FixtureType = Sheet21.Cells(row, 3)
     'Translate the acronyms for FixtureType if necessary. See "FixtureTypeChoice" named range on the Assumptions tab
-    '                 English              Spanish               French
-    If FixtureType = "MH" Or FixtureType = "AM" Or FixtureType = "MH" Then FixtureType = "MH"
-    If FixtureType = "HPS" Or FixtureType = "SAP" Or FixtureType = "SHP" Then FixtureType = "HPS"
-    If FixtureType = "LED" Or FixtureType = "LED" Or FixtureType = "LED" Then FixtureType = "LED"
+    '                 English              Spanish               French                Russian
+    If FixtureType = "MH" Or FixtureType = "AM" Or FixtureType = "MH" Or FixtureType = "MH" Then FixtureType = "MH"
+    If FixtureType = "HPS" Or FixtureType = "SAP" Or FixtureType = "SHP" Or FixtureType = "HPS" Then FixtureType = "HPS"
+    If FixtureType = "LED" Or FixtureType = "LED" Or FixtureType = "LED" Or FixtureType = "LED" Then FixtureType = "LED"
     
     'Get optional data
     'Initialize to defaults
