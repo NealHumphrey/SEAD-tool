@@ -8,7 +8,7 @@ Public gbDebug As Boolean
 Sub masterProc()
 
 'debug flag
-gbDebug = True
+gbDebug = False
 
 Application.ScreenUpdating = False
 Dim cMethod As String

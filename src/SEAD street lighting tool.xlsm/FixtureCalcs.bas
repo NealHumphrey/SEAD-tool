@@ -53,17 +53,18 @@ For i = FirstRow13 + 1 To LastRow13
     If Sheet13.Cells(i, 2) = "x" Or Sheet13.Cells(i, 2) = "X" Then TotalFixtures = TotalFixtures + 1
 Next i
         
-        
+'````````````````````````````````````
 'open the dialog for progress display
 Dim pbProgBar As IProgressBar
 Set pbProgBar = New FProgressBarIFace
 pbProgBar.Title = Sheet25.Range("tStatusHeader")
 pbProgBar.Text = Sheet25.Range("tPerformingCalcs")
 pbProgBar.Min = 0
-pbProgBar.Max = TotalFixtures + 1
+pbProgBar.max = TotalFixtures + 1
 pbProgBar.Progress = 0
 pbProgBar.Show
 pbProgBar.Progress = 0.1
+'````````````````````````````````````
 
     'show the multifixture page
     Sheet10.Select
@@ -71,7 +72,9 @@ pbProgBar.Progress = 0.1
     'Find the last column for writing output purposes
     lastCol = Sheet10.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).column
     
-    '---------Calculate the baseline first------------------------------------------------------------
+    '------------------------
+    'Run the Baseline fixture
+    '------------------------
     Application.Calculation = xlCalculationAutomatic
     Sheet2.Range("Base_Upgrade_Choice").Value = "Baseline"
     'Sheets("FixtureData").Range("A6") = "Baseline"
@@ -111,8 +114,11 @@ pbProgBar.Progress = 0.1
         'counter for how many fixtures you've run
         count = 1
         pbProgBar.Progress = count
-
-    '--------run the upgrade fixtures --------------
+    
+    
+    '------------------------
+    'Run the upgrade fixtures
+    '------------------------
     Sheet2.Range("Base_Upgrade_Choice") = "Upgrade"
     'For each fixture with an 'x' on it in the 'Fixtures' tab, calculate the results
 

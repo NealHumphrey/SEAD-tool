@@ -38,10 +38,10 @@ Public Property Get Min() As Double
 End Property
 
 'Set and get the maximum value for the bar
-Public Property Let Max(ByVal dNew As Double)
+Public Property Let max(ByVal dNew As Double)
 End Property
 
-Public Property Get Max() As Double
+Public Property Get max() As Double
 End Property
 
 'Set and get the progress point

@@ -148,12 +148,12 @@ End Property
 ' --------------------------------------------------------------
 ' 08 Jun 08     Stephen Bullen  Created
 '
-Public Property Let Max(RHS As Double)
+Public Property Let max(RHS As Double)
     mdMax = RHS
 End Property
 
-Public Property Get Max() As Double
-    Max = mdMax
+Public Property Get max() As Double
+    max = mdMax
 End Property
 
 
