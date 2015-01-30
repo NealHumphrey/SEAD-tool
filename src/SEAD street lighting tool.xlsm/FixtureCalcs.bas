@@ -121,11 +121,11 @@ pbProgBar.Progress = 0.1
     '------------------------
     Sheet2.Range("Base_Upgrade_Choice") = "Upgrade"
     'For each fixture with an 'x' on it in the 'Fixtures' tab, calculate the results
-
+    '------------------------
     'last row on the results tab (find after writing the baseline to row 4)
     lastRow = Sheet10.Cells.find(What:="*", After:=[a1], SearchOrder:=xlByRows, SearchDirection:=xlPrevious).row
 
-
+    'For each fixture on the Fixtures tab
     For i = FirstRow13 + 1 To LastRow13
         'Check row for an x to decide whether to run or not
         If Sheet13.Cells(i, 2) <> "x" And Sheet13.Cells(i, 2) <> "X" Then
@@ -133,11 +133,12 @@ pbProgBar.Progress = 0.1
         ElseIf Sheet13.Cells(i, 2) = "x" Or Sheet13.Cells(i, 2) = "X" Then
             Application.Calculation = xlCalculationAutomatic
 
-            'Write the number of the fixture in the array to the FixtureData tab to change calculations
+            'Write the ID number of the fixture in the array to the FixtureData tab to change calculations
             FixtureChoice = Application.WorksheetFunction.Match(Sheet13.Cells(i, 3), Range("FixtureChoices"), 0)
             Range("Ufixturechoice") = FixtureChoice
             Call finalMatrices
            
+            'FLAG this should be turned into a subroutine if possible.
             'Write the group name and simulation count to the results tab; if the name already exists, add "_1 - "
             '**first check for unique names
                 'GroupNamei is the name to be written - test it to make sure it doesn't exist
@@ -163,7 +164,7 @@ pbProgBar.Progress = 0.1
                     End If
                 Loop
                 
-            '**then write results to the next available row
+            '**then write SUMMMARY results to the next available row
             'Start with the name
             Sheet10.Cells(lastRow + count, 2) = GroupNamei
             'Write the rest of the fields into the results section

@@ -5,6 +5,12 @@ Global a
 
 
 Sub finalMatrices()
+'This sub is called for each fixture individually.
+'The previous macro set the 'FixtureData' sheet to be primed for the relevant fixture, by putting that Fixture's ID into the lookup function there.
+'This macro uses whatever fixture is selected on the FixtureData tab, calculates the GRID results
+'This macro then writes the results to the next available spot in the "Whole Grid" output sheets (Illuminance Calcs, Luminance Calcs, or Luminance Calcs CIE)
+'It does not write results to MResults tab or other reporting tabs (this is handled by the macros further out the calling chain).
+
 
 ' Calculate final luminance and illuminace at each grid point from all the fixtures
 Dim lanewidth, MedianLength, FixtureHeight, NumberOfLanes, polespacing
@@ -83,11 +89,42 @@ If ExitFlag = True Then
     Exit Sub
 End If
 
+'------
+'Get fixture information
+'------
+
+'1) Items in the 'Fixtures' sheet: number of fixtures per pole, separation degrees, vertical tilt, separation angle.
+Dim selectedFixturesPerPole As Integer, selectedSeparationAngleDegrees As Long, LLF As Long
+Dim tiltDegreesX As Long, tiltDegreesY As Long, tiltDegreesZ As Long    'the tilt in degrees, as entered by the user on the spreadsheet.
+Dim tiltOnX As Long, tiltOnY As Long, tiltOnZ As Long, selectedSeparationAngleRadians As Long 'The tilt in Radians
+
+LLF = Sheets("FixtureData").Range("selectedLLF").Value
+selectedFixturesPerPole = Sheets("FixtureData").Range("selectedFixturesPerPole")
+selectedSeparationAngleDegrees = Sheets("FixtureData").Range("selectedSeparationAngle")
+tiltDegreesX = Sheets("FixtureData").Range("selectedTilt")
+tiltDegreesY = 0        'tiltDegreesY is not applicable currently
+tiltDegreesZ = 0        'tiltDegreesZ will be updated below, as it varies by fixture. It is determined from the 'separation angle' if there is more than one fixture
+
+'2) Conversions
+selectedSeparationAngleRadians = selectedSeparationAngleDegrees / 180 * WorksheetFunction.Pi
+tiltOnX = tiltDegreesX / 180 * WorksheetFunction.Pi        'the up down tilt
+tiltOnY = tiltDegreesY / 180 * WorksheetFunction.Pi        'towards or away from observer, i.e. twisting the arm
+tiltOnZ = 0                                                'twisting the pole. This will be calculated in the FixturePositions sub, not assigned here
+
+
+'3) The IES data
+
+
+    'currently done within the for loop. Need to pull out here and pass back in
+
+
+
+
+
+
 'Determine calculation method
 calcMethod = Sheets("FixtureData").Range("iescieGraphChoice").Value
 
-Dim LLF
-LLF = Sheets("FixtureData").Range("H6").Value 'light loss factor
 
 Dim outputXY()
 Dim gammaArray()
@@ -105,19 +142,22 @@ ngp = TotalGridLength(calcMethod, FixtureHeight, polespacing) / GridSpace(calcMe
 outputXY = makeGrid(NumberOfLanes, calcMethod, ngp, poleconfig, MedianLength, polespacing, lanewidth)
 
 'Output the X and Y coordinates of each individual fixture.
+
+gridlength = TotalGridLength(calcMethod, FixtureHeight, polespacing)
+
 'X is along the road. Y is across the road.
 Dim fixtureX()
 Dim fixtureY()
-gridlength = TotalGridLength(calcMethod, FixtureHeight, polespacing)
-fixtureX = FixturePosition(NumberOfLanes, poleconfig, MedianLength, polespacing, lanewidth, polesetback, ArmLength, gridlength)(0)
-fixtureY = FixturePosition(NumberOfLanes, poleconfig, MedianLength, polespacing, lanewidth, polesetback, ArmLength, gridlength)(1)
-'**FLAG small performance speedup - FixturePosition function recalculates each time it is called
+Dim fixturePositions(5)     '6 arrays: X pos, Y pos, facesBackwards boolean, tiltX, tiltY, tiltZ in radians, for every individual fixture
 
-'Tilt--------------------------
-tiltDegreesX = Sheets("FixtureData").Range("selectedTilt")
-tiltOnX = tiltDegreesX / 180 * WorksheetFunction.Pi        'the up down tilt
-tiltOnY = 0 / 180 * WorksheetFunction.Pi        'towards or away from observer, i.e. twisting the arm
-tiltOnZ = 0 / 180 * WorksheetFunction.Pi        'twisting the pole
+Call FixturePosition(NumberOfLanes, poleconfig, MedianLength, polespacing, lanewidth, polesetback, ArmLength, gridlength, selectedFixturesPerPole, tiltOnX, tiltOnY, selectedSeparationAngleRadians, fixturePositions)
+fixtureX = fixturePositions(0)      'FLAG Don't need these sub arrays, can just pass whole FixturePositions array. Remove in refactor.
+fixtureY = fixturePositions(1)
+
+
+
+
+
 
 
 ' Every array prefixed L is used for Illuminance calculations and prefixed with R is used for Luminance calculations

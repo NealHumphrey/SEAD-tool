@@ -94,12 +94,12 @@ pbProgBar.Show
 pbProgBar.Progress = 0.1
 '-----------------
 
-Fixturecount = 1
+fixtureCount = 1
 ErrorCol = 13
 For row = 21 To lastRow
 
     'Get info from the sheet about the file to be loaded - name, location, type
-    pbProgBar.Progress = Fixturecount 'for use in the 'now uploading' box
+    pbProgBar.Progress = fixtureCount 'for use in the 'now uploading' box
     ISOpath = Sheet21.Cells(row, 1)
     FixtureName = Sheet21.Cells(row, 2)
     FixtureType = Sheet21.Cells(row, 3)
@@ -146,7 +146,7 @@ For row = 21 To lastRow
         Sheet21.Cells(row, ErrorCol) = "Other Error"
     End If
     
-    Fixturecount = Fixturecount + 1
+    fixtureCount = fixtureCount + 1
 Next row
 pbProgBar.Hide
 
