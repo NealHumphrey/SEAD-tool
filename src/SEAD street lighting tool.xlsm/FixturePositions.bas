@@ -32,10 +32,12 @@ numberoffixtures = numberoffixtures * selectedFixturesPerPole       'if there ar
 If PoleConfiguration <> "Single-side" Then numberoffixtures = 2 * numberoffixtures          'all scenarios except 'single-side' have double the number of fixtures. FLAG this might be different than before in the staggered configuration because it might include one extra fixture....
 
 
-'Array with the X and Y coordinates of each pole
+'Array swith the X and Y coordinates of each pole as well as other fixture specific data
 ReDim FPArrayX(1 To CInt(numberoffixtures))
 ReDim FPArrayY(1 To CInt(numberoffixtures))
 ReDim FPArrayBackwards(1 To CInt(numberoffixtures))
+ReDim FPArrayTiltX(1 To CInt(numberoffixtures))
+ReDim FPArrayTiltY(1 To CInt(numberoffixtures))
 ReDim FPArrayTiltZ(1 To CInt(numberoffixtures))
 
 'adjustment factors from where the pole should be to where the fixture is actually located
@@ -94,8 +96,10 @@ Do While fixtureCount <= UBound(FPArrayX)
             'assign to arrays
             FPArrayX(fixtureCount) = tempX
             FPArrayY(fixtureCount) = tempY
-            FPArrayBackwards(fixtureCount) = facesBackwards
-            FPArrayTiltZ(fixtureCount) = tempTiltZ
+            FPArrayBackwards(fixtureCount) = facesBackwards 'boolean flag for direction
+            FPArrayTiltX(fixtureCount) = tiltOnX              'the same for every fixture
+            FPArrayTiltY(fixtureCount) = tiltOnY              'the same for exvery fixture
+            FPArrayTiltZ(fixtureCount) = tempTiltZ  'varies - calculated above
             
             fixtureCount = fixtureCount + 1
         Next fixtureOnPole
@@ -107,8 +111,8 @@ Loop
 fixturePositions(0) = FPArrayX
 fixturePositions(1) = FPArrayY
 fixturePositions(2) = FPArrayBackwards
-fixturePositions(3) = tiltOnX   'all the same value
-fixturePositions(4) = tiltOnY   'all the same value
+fixturePositions(3) = FPArrayTiltX
+fixturePositions(4) = FPArrayTiltY
 fixturePositions(5) = FPArrayTiltZ 'varies whether it is fixture 1 or fixture 2 on the pole
 
 

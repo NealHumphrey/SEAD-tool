@@ -2,15 +2,16 @@ Attribute VB_Name = "AngleCalculations"
 'This macro was developed by p2w2.  http://p2w2.com/expert-in-microsoft-excel-consultants-consulting/index.php
 'Please contact at CS@perceptive-analytics.com in case of any enquiry
 
-Function angleGammaWithTilt(fixtureX, fixtureY, gridXY, tiltOnX, tiltOnY, tiltOnZ, calculationmethod, intBaselineUpgradeChoice, geometryValues()) As Variant
+Function angleGammaWithTilt(fixtureX, fixtureY, backwardsFlag As Boolean, tiltOnX, tiltOnY, tiltOnZ, gridXY, calculationmethod, intBaselineUpgradeChoice, geometryValues()) As Variant
 'gamma is the vertical angle coming out of the fixture, between the line directly to the ground and the line extending from fixture to grid point
 'When the fixture is tilted, the line directly to the ground is instead the line extending straight out of the center of the fixture.
 
 'Variables required:
 'fixtureX is the x coordinate of the fixture currently being calculated
 'fixtureY is the y coordinate of the same
-'gridXY() is an array containing the x/y coordinates of all grid points from the start to end of the road. istart and iend are used to select only the actual calculated grid bounds to be used here.
+'backwardsFlag determines which direction the fixture faces(based on which side of the road it is on)
 'tiltOnX, Y, and Z are the tilt in radians of the fixture, for the current calculation
+'gridXY() is an array containing the x/y coordinates of all grid points from the start to end of the road. istart and iend are used to select only the actual calculated grid bounds to be used here.
 'calculationmethod is either CIE or IES
 'intBaselineUpgradeChoice is used for choosing which road geometry data to use. 1 = Baseline, 2 = Upgrade
 'geometryValues() is an array containing the road geometry data. Column 0 is header names (for reference), column 1 is baseline, 2 is upgrade. Rows are:
@@ -37,10 +38,13 @@ Dim outputX(), outputY()
 outputX = gridXY(0)
 outputY = gridXY(1)
 
+'------------------------
 'Calculate grid start and end in the X direction (along road).
-'Different methods are needed because of the rules about how many fixtures are included in the calculation in the two methods
-'The match method is a sloppy way to do this - it depends on the outputX array to have a certain number of poles before the grid starts, but doesn't save that data explicitly, just assumes it will be. Works, but would be nice to refactor eventually.
-'FLAG move this and the version in Phi up the call stack, and do it cleaner.
+    'Different methods are needed because of the rules about how many fixtures are included in the calculation in the two methods
+    'The match method is a sloppy way to do this - it depends on the outputX array to have a certain number of poles before the
+    'grid starts, but doesn't save that data explicitly, just assumes it will be. Works, but would be nice to refactor eventually.
+    'FLAG move this and the version in Phi up the call stack, and do it cleaner.
+'------------------------
 If calculationmethod = "IES" Then
     istart = WorksheetFunction.Match(polespacing, outputX, True)
     iend = WorksheetFunction.Match(2 * polespacing, outputX, True) - 1
@@ -64,9 +68,11 @@ ReDim gammaArray(istart To iend, numberOfY)
 Dim xArray(), yArray(), xPrimeArray(), yPrimeArray(), hPrimeArray()
 ReDim xArray(istart To iend, numberOfY): ReDim yArray(istart To iend, numberOfY): ReDim xPrimeArray(istart To iend, numberOfY): ReDim yPrimeArray(istart To iend, numberOfY): ReDim hPrimeArray(istart To iend, numberOfY)
 'm = outputX(1) FLAG delete me if no calc errors - appears unused
+
 For i = istart To iend          'each grid point in the x direction
     For j = 0 To numberOfY      'each grid point in the y direction
          'Variables in formulas written in standard vs. variable names used here
+         'Just for comparing to PDF, v,w,o are not used in the VBA
         '    v = tiltOnZ
         '    w = tiltOnY
         '    o = tiltOnX
@@ -76,28 +82,10 @@ For i = istart To iend          'each grid point in the x direction
         x = (outputX(i) - fixtureX)
         y = (outputY(j) - fixtureY)
         
-        'Determine which side of the road the fixture is on.
-        If fixtureY < (lanewidth * NumberOfLanes + MedianLength) / 2 Then
-            nearSide = True
-        Else
-            nearSide = False
-        End If
-        
-        'Depending which side of the road the fixture is on, the sign of 'y' may need to be reversed because the fixture will be rotated 180 degrees. Logic below makes the determination.
-        If poleconfig <> "Median mounted" Then
-            If nearSide = True Then
-                y = y           'if it is on the near side, the previously calculated y is correct
-            Else
-                y = -y                            'if the fixture is located on the far side of the road, it is rotated 180 degrees
-            End If
-        ElseIf poleconfig = "Median mounted" Then   'in the 'Median mounted configuration, the one on the near side is rotated 180 degrees while the one on the far side is normal. This is the opposite of the other configurations.
-            If nearSide = True Then
-                y = -y          'nearside is rotated 180 degrees because it is mounted in median
-            Else
-                y = y           'farside is not rotated in the median mounted configuration
-            End If
-        End If
-        
+        'Depending which way the fixture faces, the sign of 'y' may need to be reversed because the fixture will be rotated 180 degrees.
+        If backwardsFlag = False Then y = y
+        If backwardsFlag = True Then y = -y
+
          'Calculate angle including tilt
         xPrime = x * (Cos(tiltOnZ) * Cos(tiltOnY) - Sin(tiltOnZ) * Sin(tiltOnX) * Sin(tiltOnY)) + _
                  y * (Sin(tiltOnZ) * Cos(tiltOnY) + Cos(tiltOnZ) * Sin(tiltOnX) * Sin(tiltOnY)) + _
@@ -154,7 +142,7 @@ Distance = Sqr((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
 End Function
 
 
-Function anglePhiWithTilt(fixtureX, fixtureY, gridXY(), tiltOnX, tiltOnY, tiltOnZ, calculationmethod, intBaselineUpgradeChoice, geometryValues()) As Variant
+Function anglePhiWithTilt(fixtureX, fixtureY, backwardsFlag As Boolean, tiltOnX, tiltOnY, tiltOnZ, gridXY(), calculationmethod, intBaselineUpgradeChoice, geometryValues()) As Variant
 'This function calculates the angle phi between the measurement grid point and the fixture itself.
 'With the tilt, this angle phi can be used to calculate the light coming out of the fixture, i.e. the data in the IES files.
 'If tilt is set to 0,0,0, the angle matches the actual angle between the fixture and grid for use in the Luminance calculation.
@@ -165,7 +153,7 @@ Function anglePhiWithTilt(fixtureX, fixtureY, gridXY(), tiltOnX, tiltOnY, tiltOn
 'fixtureY is the y coordinate of the same
 'gridXY() is an array containing the x/y coordinates of all grid points from the start to end of the road. istart and iend are used to select only the actual calculated grid bounds to be used here.
 'tiltOnX, Y, and Z are the tilt in radians of the fixture, for the current calculation
-'calculationmethod is either CIE or IES
+'calculationmethod is either CIE or IES (string)
 'intBaselineUpgradeChoice is used for choosing which road geometry data to use. 1 = Baseline, 2 = Upgrade
 'geometryValues() is an array containing the road geometry data. Column 0 is header names (for reference), column 1 is baseline, 2 is upgrade. Rows are:
     'geometryValues(1, 0) = "NumLanes"
@@ -191,9 +179,12 @@ Dim outputX(), outputY()
 outputX = gridXY(0)
 outputY = gridXY(1)
 
+'------------------------------------
 'Calculate grid start and end in the X direction (along road).
-'Different methods are needed because of the rules about how many fixtures are included in the calculation in the two methods
-'The match method is a sloppy way to do this - it depends on the outputX array to have a certain number of poles before the grid starts, but doesn't save that data explicitly, just assumes it will be. Works, but would be nice to refactor eventually.
+        'Different methods are needed because of the rules about how many fixtures are included in the calculation in the two methods
+        'The match method is a sloppy way to do this - it depends on the outputX array to have a certain number of poles before the
+        'grid starts, but doesn't save that data explicitly, just assumes it will be. Works, but would be nice to refactor eventually.
+'------------------------------------
 If calculationmethod = "IES" Then
     'In the IES method, the measurement grid starts one polespacing length from the first pole.
     'istart is the lower bound to use for grid points in the X direction; iend is the upper bound.
@@ -217,68 +208,50 @@ numberOfX = iend - istart
 numberOfY = UBound(outputY)
 Dim phiArray()
 ReDim phiArray(istart To iend, numberOfY)
-For i = istart To iend              'each grid point in the x direction
-For j = 0 To numberOfY              'each grid point in the y direction
-    'Variables in formulas written in standard vs. variable names used here
-    '    v = tiltOnZ
-    '    w = tiltOnY
-    '    o = tiltOnX
-    Dim x As Double, y As Double
-    Dim nearSide As Boolean
-    
-    'Get distances for calculating the angle
-    x = (outputX(i) - fixtureX)
-    y = (outputY(j) - fixtureY)
-    
-    'Determine which side of the road the fixture is on.
-    If fixtureY < (lanewidth * NumberOfLanes + MedianLength) / 2 Then
-        nearSide = True
-    Else
-        nearSide = False
-    End If
-    
-    'Depending which side of the road the fixture is on, the sign of 'y' may need to be reversed because the fixture will be rotated 180 degrees.
-    If poleconfig <> "Median mounted" Then
-        If nearSide = True Then
-            y = y           'if it is on the near side, the previously calculated y is correct
+For i = istart To iend                  'each grid point in the x direction
+    For j = 0 To numberOfY              'each grid point in the y direction
+        'Variables in formulas written in standard vs. variable names used here
+        'v,w,o are just how they are written in the pdf - not used anywhere here
+        '    v = tiltOnZ
+        '    w = tiltOnY
+        '    o = tiltOnX
+        Dim x As Double, y As Double
+        Dim nearSide As Boolean
+        
+        'Get distances for calculating the angle
+        x = (outputX(i) - fixtureX)
+        y = (outputY(j) - fixtureY)
+        
+        'Depending which way the fixture faces, the sign of 'y' may need to be reversed because the fixture will be rotated 180 degrees.
+        If backwardsFlag = False Then y = y
+        If backwardsFlag = True Then y = -y
+        
+        'Calculate angle including tilt
+        xPrime = x * (Cos(tiltOnZ) * Cos(tiltOnY) - Sin(tiltOnZ) * Sin(tiltOnX) * Sin(tiltOnY)) + _
+                 y * (Sin(tiltOnZ) * Cos(tiltOnY) + Cos(tiltOnZ) * Sin(tiltOnX) * Sin(tiltOnY)) + _
+                 FixtureHeight * Cos(tiltOnX) * Sin(tiltOnY)
+        yPrime = -x * Sin(tiltOnZ) * Cos(tiltOnX) + _
+                    y * Cos(tiltOnZ) * Cos(tiltOnX) - _
+                    FixtureHeight * Sin(tiltOnX)
+        HPrime = -x * (Sin(tiltOnZ) * Sin(tiltOnX) * Cos(tiltOnY) + Cos(tiltOnZ) * Sin(tiltOnY)) - _
+                y * (Sin(tiltOnZ) * Sin(tiltOnY) - Cos(tiltOnZ) * Sin(tiltOnX) * Cos(tiltOnY)) + _
+                FixtureHeight * Cos(tiltOnX) * Cos(tiltOnY)
+        
+        If yPrime <> 0 Then
+            phiTemp = Atn(Abs(xPrime) / Abs(yPrime)) * 180 / WorksheetFunction.Pi
         Else
-            y = -y                            'if the fixture is located on the far side of the road, it is rotated 180 degrees
+            phiTemp = 90
         End If
-    ElseIf poleconfig = "Median mounted" Then   'in the 'Median mounted configuration, the one on the near side is rotated 180 degrees while the one on the far side is normal. This is the opposite of the other configurations.
-        If nearSide = True Then
-            y = -y          'nearside is rotated 180 degrees because it is mounted in median
+        
+        'convert the angle if it is located behind the fixture
+        If yPrime < 0 Then
+            phiTemp = 180 - phiTemp
         Else
-            y = y                             'farside is not rotated in the median mounted configuration
+            phiTemp = phiTemp
         End If
-    End If
-    
-    'Calculate angle including tilt
-    xPrime = x * (Cos(tiltOnZ) * Cos(tiltOnY) - Sin(tiltOnZ) * Sin(tiltOnX) * Sin(tiltOnY)) + _
-             y * (Sin(tiltOnZ) * Cos(tiltOnY) + Cos(tiltOnZ) * Sin(tiltOnX) * Sin(tiltOnY)) + _
-             FixtureHeight * Cos(tiltOnX) * Sin(tiltOnY)
-    yPrime = -x * Sin(tiltOnZ) * Cos(tiltOnX) + _
-                y * Cos(tiltOnZ) * Cos(tiltOnX) - _
-                FixtureHeight * Sin(tiltOnX)
-    HPrime = -x * (Sin(tiltOnZ) * Sin(tiltOnX) * Cos(tiltOnY) + Cos(tiltOnZ) * Sin(tiltOnY)) - _
-            y * (Sin(tiltOnZ) * Sin(tiltOnY) - Cos(tiltOnZ) * Sin(tiltOnX) * Cos(tiltOnY)) + _
-            FixtureHeight * Cos(tiltOnX) * Cos(tiltOnY)
-    
-    If yPrime <> 0 Then
-        phiTemp = Atn(Abs(xPrime) / Abs(yPrime)) * 180 / WorksheetFunction.Pi
-    Else
-        phiTemp = 90
-    End If
-    
-    'convert the angle if it is located behind the fixture
-    If yPrime < 0 Then
-        phiTemp = 180 - phiTemp
-    Else
-        phiTemp = phiTemp
-    End If
-    
-    phiArray(i, j) = phiTemp
-    'FLAG - change to deal with varying angles 'FLAG I think this comment can be deleted, not sure what it referred to....
-Next j
+        
+        phiArray(i, j) = phiTemp
+    Next j
 Next i
 '------------------------------------------------------------------------------------
 

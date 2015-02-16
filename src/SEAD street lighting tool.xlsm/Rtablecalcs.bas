@@ -10,16 +10,17 @@ Dim outputY()
 outputX = gridXY(0)
 outputY = gridXY(1)
 
-Dim numberoffixtures As Integer
-
-If poleconfig = "Opposite" Or poleconfig = "Median mounted" Then
-    numberoffixtures = (gridlength / polespacing) * 2
-ElseIf poleconfig = "Single" Or poleconfig = "Staggered" Then
-    numberoffixtures = (gridlength / polespacing)
-End If
+'FLAG This doesn't appear to be used. Delete if no error.
+'Dim numberoffixtures As Integer
+'If poleconfig = "Opposite" Or poleconfig = "Median mounted" Then
+'    numberoffixtures = (gridlength / polespacing) * 2
+'ElseIf poleconfig = "Single" Or poleconfig = "Staggered" Then
+'    numberoffixtures = (gridlength / polespacing)
+'End If
 
 
 'grid start and end
+'FLAG again this is a poor method. Should refactor, and move one step up the calling stack to not repeat.
 If calculationmethod = "IES" Then
 istart = WorksheetFunction.Match(polespacing, outputX, True)
 iend = WorksheetFunction.Match(2 * polespacing, outputX, True) - 1

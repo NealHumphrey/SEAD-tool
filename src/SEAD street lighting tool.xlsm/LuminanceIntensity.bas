@@ -10,14 +10,13 @@ Dim outputY()
 outputX = gridXY(0)
 outputY = gridXY(1)
 
-Dim numberoffixtures As Integer
-
-
-If PoleConfiguration = "Single-side" Then
-    numberoffixtures = (gridlength / polespacing)
-Else
-    numberoffixtures = (gridlength / polespacing) * 2
-End If
+'FLAG this does not appear to be used anywhere; commenting out, delete if no errors
+'Dim numberoffixtures As Integer
+'If PoleConfiguration = "Single-side" Then
+'    numberoffixtures = (gridlength / polespacing)
+'Else
+'    numberoffixtures = (gridlength / polespacing) * 2
+'End If
 
 
 'grid start and end
