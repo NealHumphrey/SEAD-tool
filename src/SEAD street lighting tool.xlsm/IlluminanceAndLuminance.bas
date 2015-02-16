@@ -186,6 +186,9 @@ Dim RnextArray()
 Dim rownum
 rownum = 13 'This is the first row on the "Luminance Calcs CIE" tab where results are written. It gets incremented as each lane gets calculated in turn.
 
+'variables for use while iterating on the fixtures.
+Dim tiltOnX_k, tiltOnY_k, tiltOnZ_k, backwardsFlag_k As Boolean, fixtureX_k, fixtureY_k
+            
 ' If IES method
 If calcMethod = "IES" Then
     '******************************************************************************************************
@@ -204,7 +207,6 @@ If calcMethod = "IES" Then
     '------------------------------------------------------------------
         For k = LBound(fixtureX) To UBound(fixtureX)
             'extract fixture data for current fixture
-            Dim tiltOnX_k, tiltOnY_k, tiltOnZ_k, backwardsFlag_k As Boolean, fixtureX_k, fixtureY_k
             fixtureX_k = fixturePositions(0)(k)
             fixtureY_k = fixturePositions(1)(k)
             backwardsFlag_k = fixturePositions(2)(k)
@@ -348,30 +350,28 @@ ElseIf calcMethod = "CIE" Then
     'Calculate Luminance at each grid point; these will be summed afterwards. k iterates through each fixture
     '------------------------------
         For k = LBound(fixtureX) To UBound(fixtureX)                'each fixture
+            'extract fixture data for current fixture
+            fixtureX_k = fixturePositions(0)(k)
+            fixtureY_k = fixturePositions(1)(k)
+            backwardsFlag_k = fixturePositions(2)(k)
+            tiltOnX_k = fixturePositions(3)(k)
+            tiltOnY_k = fixturePositions(4)(k)
+            tiltOnZ_k = fixturePositions(5)(k)
+            
             'Angle calculations
-            
-            
-            'FLAG UPDATE THESE!!
-            
-'            phi = anglePhiWithTilt(fixtureX(k), fixtureY(k), outputXY, 0, 0, 0, calcMethod, intBaselineUpgradeChoice, geometryValues())     'use zero degree tilt for the reflectance calculations
-'            phiArrayForITable = anglePhiWithTilt(fixtureX(k), fixtureY(k), outputXY, tiltOnX, tiltOnY, tiltOnZ, calcMethod, intBaselineUpgradeChoice, geometryValues)   'use tilt for the light intensity lookup
-'            gammaArray = angleGammaWithTilt(fixtureX(k), fixtureY(k), outputXY, 0, 0, 0, calcMethod, intBaselineUpgradeChoice, geometryValues)
-'            gammaArrayForITable = angleGammaWithTilt(fixtureX(k), fixtureY(k), outputXY, tiltOnX, tiltOnY, tiltOnZ, calcMethod, intBaselineUpgradeChoice, geometryValues)
-'            betaArray = angleBeta(phi(), calcMethod, fixtureX(k), fixtureY(k), outputXY, polespacing, lanewidth, FixtureHeight, yo) 'yo is not used when the calc method is IES
-            
-            
-            
-            
-            
-            
-            
+            phi = anglePhiWithTilt(fixtureX_k, fixtureY_k, backwardsFlag_k, 0, 0, 0, outputXY, calcMethod, intBaselineUpgradeChoice, geometryValues()) 'For the actual angle, tilt is zero since it is the angle of the light path itself
+            phiArrayForITable = anglePhiWithTilt(fixtureX_k, fixtureY_k, backwardsFlag_k, tiltOnX_k, tiltOnY_k, tiltOnZ_k, outputXY, calcMethod, intBaselineUpgradeChoice, geometryValues()) 'for the I table, tilt is used to change which angle is used for the light intensity lookup
+            gammaArray = angleGammaWithTilt(fixtureX_k, fixtureY_k, backwardsFlag_k, 0, 0, 0, outputXY, calcMethod, intBaselineUpgradeChoice, geometryValues())
+            gammaArrayForITable = angleGammaWithTilt(fixtureX_k, fixtureY_k, backwardsFlag_k, tiltOnX_k, tiltOnY_k, tiltOnZ_k, outputXY, calcMethod, intBaselineUpgradeChoice, geometryValues())
+            'different from IES method:
+            betaArray = angleBeta(phi(), calcMethod, fixtureX_k, fixtureY_k, outputXY, polespacing, lanewidth, FixtureHeight, yo) 'yo is the position of the observer
             
             'getting luminous intensity using quadratic interpolation
-            larray = LintensityMatrix(ngp, poleconfig, fixtureX(k), fixtureY(k), outputXY, polespacing, FixtureHeight, calcMethod, phiArrayForITable, gammaArrayForITable)
+            larray = LintensityMatrix(ngp, poleconfig, fixtureX_k, fixtureY_k, outputXY, polespacing, FixtureHeight, calcMethod, phiArrayForITable, gammaArrayForITable)
             LarrayMatrix(k) = larray
             
             'Road reflectance using quadratic interpolation
-            Rarray = RMatrix(gridlength, poleconfig, fixtureX(k), fixtureY(k), outputXY(), polespacing, FixtureHeight, calcMethod, betaArray, gammaArray)
+            Rarray = RMatrix(gridlength, poleconfig, fixtureX_k, fixtureY_k, outputXY(), polespacing, FixtureHeight, calcMethod, betaArray, gammaArray)
             RarrayMatrix(k) = Rarray
             
             'Calculating luminance
@@ -492,32 +492,29 @@ ElseIf calcMethod = "CIE" Then
     ' same routine again, but a different grid. FLAG this needs to be updated to work with tilt
     For k = LBound(fixtureX) To UBound(fixtureX)
         
-        
-        
-        'FLAG UPDATE THESE!!
-        
-        
-'
-'        phi = anglePhiWithTilt(fixtureX(k), fixtureY(k), outputXY, 0, 0, 0, calcMethod, intBaselineUpgradeChoice, geometryValues())
-'        gammaArray = angleGammaWithTilt(fixtureX(k), fixtureY(k), outputXY, 0, 0, 0, calcMethod, intBaselineUpgradeChoice, geometryValues)
-'        betaArray = angleBeta(phi(), calcMethod, fixtureX(k), fixtureY(k), outputXY, polespacing, lanewidth, FixtureHeight, 0)
-'        phiArrayForITable = anglePhiWithTilt(fixtureX(k), fixtureY(k), outputXY, tiltOnX, tiltOnY, tiltOnZ, calcMethod, intBaselineUpgradeChoice, geometryValues)   'use tilt for the light intensity lookup
-'        gammaArrayForITable = angleGammaWithTilt(fixtureX(k), fixtureY(k), outputXY, tiltOnX, tiltOnY, tiltOnZ, calcMethod, intBaselineUpgradeChoice, geometryValues)
-'
-        
-        
-        
-        
-        
+        'extract fixture data for current fixture
+        fixtureX_k = fixturePositions(0)(k)
+        fixtureY_k = fixturePositions(1)(k)
+        backwardsFlag_k = fixturePositions(2)(k)
+        tiltOnX_k = fixturePositions(3)(k)
+        tiltOnY_k = fixturePositions(4)(k)
+        tiltOnZ_k = fixturePositions(5)(k)
+
+        phi = anglePhiWithTilt(fixtureX_k, fixtureY_k, backwardsFlag_k, 0, 0, 0, outputXY, calcMethod, intBaselineUpgradeChoice, geometryValues()) 'For the actual angle, tilt is zero since it is the angle of the light path itself
+        phiArrayForITable = anglePhiWithTilt(fixtureX_k, fixtureY_k, backwardsFlag_k, tiltOnX_k, tiltOnY_k, tiltOnZ_k, outputXY, calcMethod, intBaselineUpgradeChoice, geometryValues()) 'for the I table, tilt is used to change which angle is used for the light intensity lookup
+        gammaArray = angleGammaWithTilt(fixtureX_k, fixtureY_k, backwardsFlag_k, 0, 0, 0, outputXY, calcMethod, intBaselineUpgradeChoice, geometryValues())
+        gammaArrayForITable = angleGammaWithTilt(fixtureX_k, fixtureY_k, backwardsFlag_k, tiltOnX_k, tiltOnY_k, tiltOnZ_k, outputXY, calcMethod, intBaselineUpgradeChoice, geometryValues())
+        betaArray = angleBeta(phi(), calcMethod, fixtureX_k, fixtureY_k, outputXY, polespacing, lanewidth, FixtureHeight, 0)
+                    
         'removing effect of all the luminaries outside 5H distance
-        If outputXY(0)(LBound(gammaArray)) - fixtureX(k) > 5 * FixtureHeight Or fixtureX(k) - outputXY(0)(UBound(gammaArray)) > 5 * FixtureHeight Then
+        If outputXY(0)(LBound(gammaArray)) - fixtureX_k > 5 * FixtureHeight Or fixtureX_k - outputXY(0)(UBound(gammaArray)) > 5 * FixtureHeight Then
             LLF = 0
         Else
             LLF = Sheets("FixtureData").Range("H6").Value
         End If
         
         'Luminous intensity calculations using quadratic interpolation (includes tilt)
-        larray = LintensityMatrix(ngp, poleconfig, fixtureX(k), fixtureY(k), outputXY, polespacing, FixtureHeight, calcMethod, phiArrayForITable, gammaArrayForITable)
+        larray = LintensityMatrix(ngp, poleconfig, fixtureX_k, fixtureY_k, outputXY, polespacing, FixtureHeight, calcMethod, phiArrayForITable, gammaArrayForITable)
         LarrayMatrix(k) = larray
         
         ' Illuminance at every grid point by fixture k

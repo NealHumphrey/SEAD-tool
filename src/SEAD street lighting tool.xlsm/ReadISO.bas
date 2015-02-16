@@ -14,6 +14,9 @@ Dim LLD As Double
 Dim LDD As Double
 Dim BF As Double
 Dim Tilt As Double
+Dim FixturesPerPole As Integer
+Dim separationAngle As Integer
+
 
 Dim TooManyColumns As Boolean
 Dim OtherError As Boolean
@@ -120,8 +123,11 @@ For row = 21 To lastRow
     LDD = Range(FixtureType & "DD")
     BF = Range(FixtureType & "BF")
     Tilt = 0
+    FixturesPerPole = 1
+    separationAngle = 0
     
     'If values are entered on the row, overwrite the default
+    'If adding fields, also need to update in the ReadISOFile subroutine
     If Sheet21.Cells(row, 4).Value <> "" Then EquipmentCost = Sheet21.Cells(row, 4).Value
     If Sheet21.Cells(row, 5).Value <> "" Then InstallationCost = Sheet21.Cells(row, 5).Value
     If Sheet21.Cells(row, 6).Value <> "" Then Rebate = Sheet21.Cells(row, 6).Value
@@ -131,7 +137,9 @@ For row = 21 To lastRow
     If Sheet21.Cells(row, 10).Value <> "" Then LDD = Sheet21.Cells(row, 10).Value
     If Sheet21.Cells(row, 11).Value <> "" Then BF = Sheet21.Cells(row, 11).Value
     If Sheet21.Cells(row, 12).Value <> "" Then Tilt = Sheet21.Cells(row, 12).Value
-
+    If Sheet21.Cells(row, 13).Value <> "" Then FixturesPerPole = Sheet21.Cells(row, 13).Value
+    If Sheet21.Cells(row, 14).Value <> "" Then separationAngle = Sheet21.Cells(row, 14).Value
+    
     'Initialize Error variables
     TooManyColumns = False 'test to see if the Candela data will fit - set to false initialy
     OtherError = False 'again, set other error to false initially
@@ -497,7 +505,9 @@ If CompatibleColumns = True Then
     Sheet13.Cells(LastRowSheet13 + 1, 17) = LDD
     Sheet13.Cells(LastRowSheet13 + 1, 18) = BF
     'skip column 19 for total depreciation formula
-    Sheet13.Cells(LastRowSheet13 + 1, 20) = BF
+    Sheet13.Cells(LastRowSheet13 + 1, 20) = Tilt
+    Sheet13.Cells(LastRowSheet13 + 1, 21) = FixturesPerPole
+    Sheet13.Cells(LastRowSheet13 + 1, 22) = separationAngle
     
     'Intro information
     Sheet2.Cells(StartRow, 2) = FixtureName

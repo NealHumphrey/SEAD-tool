@@ -27,18 +27,18 @@ Sub FixturePosition(NumberOfLanes, PoleConfiguration As String, MedianLength, po
 
 Dim FPArrayX(), FPArrayY(), FPArrayBackwards(), FPArrayTiltZ()
 
-numberoffixtures = (gridlength / polespacing) + 1                     'default starting point, this is a single-side configuration
+numberoffixtures = CInt((gridlength / polespacing)) + 1                     'default starting point, this is a single-side configuration
 numberoffixtures = numberoffixtures * selectedFixturesPerPole       'if there are multiple fixtures per pole
 If PoleConfiguration <> "Single-side" Then numberoffixtures = 2 * numberoffixtures          'all scenarios except 'single-side' have double the number of fixtures. FLAG this might be different than before in the staggered configuration because it might include one extra fixture....
 
 
 'Array swith the X and Y coordinates of each pole as well as other fixture specific data
-ReDim FPArrayX(1 To CInt(numberoffixtures))
-ReDim FPArrayY(1 To CInt(numberoffixtures))
-ReDim FPArrayBackwards(1 To CInt(numberoffixtures))
-ReDim FPArrayTiltX(1 To CInt(numberoffixtures))
-ReDim FPArrayTiltY(1 To CInt(numberoffixtures))
-ReDim FPArrayTiltZ(1 To CInt(numberoffixtures))
+ReDim FPArrayX(1 To numberoffixtures)
+ReDim FPArrayY(1 To numberoffixtures)
+ReDim FPArrayBackwards(1 To numberoffixtures)
+ReDim FPArrayTiltX(1 To numberoffixtures)
+ReDim FPArrayTiltY(1 To numberoffixtures)
+ReDim FPArrayTiltZ(1 To numberoffixtures)
 
 'adjustment factors from where the pole should be to where the fixture is actually located
 adjX_arm = ArmLength * Sin(selectedSeparationAngleRadians / 2)                  'assumes symetric distribution when there are two fixtures on a pole. Would also work for 3 fixtures if other logic used adjustment correctly
