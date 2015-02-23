@@ -2,22 +2,22 @@ Attribute VB_Name = "FixturePositions"
 'This macro was developed by p2w2.  http://p2w2.com/expert-in-microsoft-excel-consultants-consulting/index.php
 'Please contact at CS@perceptive-analytics.com in case of any enquiry
 
-Sub drawFixtures(dataSheet As String, lanewidth, MedianLength, FixtureHeight, NumberOfLanes, polespacing, polesetback, ArmLength, calculationmethod As String, PoleConfiguration As String, gridlength)
+Sub drawFixtures(dataSheet As String, lanewidth, MedianLength, FixtureHeight, NumberOfLanes, polespacing, polesetback, ArmLength, calculationmethod As String, poleconfig As String, gridlength)
 
 ' to draw fixtures on road geometry page
 
-Dim outputX() As Variant
-Dim outputY() As Variant
-outputX = FixturePosition(NumberOfLanes, PoleConfiguration, MedianLength, polespacing, lanewidth, polesetback, ArmLength, gridlength)(0)
-outputY = FixturePosition(NumberOfLanes, PoleConfiguration, MedianLength, polespacing, lanewidth, polesetback, ArmLength, gridlength)(1)
+Dim fixtureX()
+Dim fixtureY()
+Dim fixturePositions(5)     '6 arrays: X pos, Y pos, facesBackwards boolean, tiltX, tiltY, tiltZ in radians, for every individual fixture
 
-
-For i = 0 To UBound(outputX)
-
-Sheets(dataSheet).Cells(i + 2, 84) = outputX(i)
-Sheets(dataSheet).Cells(i + 2, 85) = outputY(i)
-
-Next
+Call FixturePosition(NumberOfLanes, poleconfig, MedianLength, polespacing, lanewidth, polesetback, ArmLength, gridlength, 1, 0, 0, 0, fixturePositions)
+fixtureX = fixturePositions(0)      'FLAG Don't need these sub arrays, can just pass whole FixturePositions array. Remove in refactor.
+fixtureY = fixturePositions(1)
+    
+    For i = LBound(fixtureX) To UBound(fixtureX)
+        Sheets(dataSheet).Cells(i + 2, 84) = fixtureX(i)
+        Sheets(dataSheet).Cells(i + 2, 85) = fixtureY(i)
+    Next
 End Sub
 Sub FixturePosition(NumberOfLanes, PoleConfiguration As String, MedianLength, polespacing, lanewidth, polesetback, ArmLength, gridlength, selectedFixturesPerPole, tiltOnX, tiltOnY, selectedSeparationAngleRadians, fixturePositions)
 
